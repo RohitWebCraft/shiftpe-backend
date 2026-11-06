@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ShiftPe – Swipe. Work. Earn.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--ink:#16181f;--mute:#6b7080;--line:#e6e9f2;--brand:#f0455a;--brand2:#ff7a59;--soft:#fdeaed;--ok:#15935f;--okbg:#e2f6ec;--warn:#b86b00;--warnbg:#fff1d9;--shadow:0 10px 30px rgba(30,40,80,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10121a;--card:#1b1e29;--ink:#f1f2f7;--mute:#9aa0b4;--line:#2b2f3e;--soft:#3a1d25;--okbg:#12352a;--warnbg:#3b2b10;--shadow:0 10px 30px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#10121a;--card:#1b1e29;--ink:#f1f2f7;--mute:#9aa0b4;--line:#2b2f3e;--soft:#3a1d25;--okbg:#12352a;--warnbg:#3b2b10;--shadow:0 10px 30px rgba(0,0,0,.5)}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;justify-content:center;font-size:15px}
+h1,h2,h3,.logo{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;margin:0;letter-spacing:-.02em}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+#app{width:100%;max-width:440px;height:100%;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg)}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
+.logo{display:flex;align-items:center;gap:8px;font-size:22px;font-weight:800}
+.logo i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;display:grid;place-items:center;font-style:normal;font-size:17px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{padding:6px 14px;border-radius:999px;font-weight:600;font-size:13px;color:var(--mute)}.seg button.on{background:var(--brand);color:#fff}
+main{flex:1;overflow-y:auto;padding:4px 16px 16px}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card);padding:6px 8px}
+nav button{flex:1;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--mute);font-weight:600}
+nav button.on{color:var(--brand)}nav b{font-size:20px;font-weight:400}
+.kick{color:var(--brand);font-weight:700;font-size:12px;margin:6px 0 2px}
+h1{font-size:30px;font-weight:800;margin-bottom:2px}.sub{color:var(--mute);margin:0 0 12px}.x{color:var(--mute);font-size:12px}
+.stack{position:relative;height:520px}
+.job{position:absolute;inset:0;background:var(--card);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;touch-action:pan-y;user-select:none;display:flex;flex-direction:column}
+.job.back{transform:scale(.95) translateY(12px);opacity:.7;pointer-events:none}
+.cover{height:170px;display:grid;place-items:center;font-size:68px;position:relative}
+.tag{position:absolute;top:12px;left:12px;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--okbg);color:var(--ok)}.tag.u{background:var(--brand);color:#fff}
+.dist{position:absolute;bottom:10px;right:12px;background:rgba(0,0,0,.55);color:#fff;border-radius:99px;padding:3px 10px;font-size:12px}
+.jb{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1;overflow:hidden}.jb h2{font-size:20px;font-weight:800}
+.biz{color:var(--mute);font-size:13px}
+.pay{display:flex;justify-content:space-between;align-items:center;background:var(--soft);border-radius:14px;padding:10px 14px}
+.pay small{display:block;color:var(--mute);font-size:11px}.pay strong{font-size:22px;font-family:"Bricolage Grotesque",sans-serif}.pay .m{text-align:right}.pay .m strong{color:var(--ok)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:4px 11px;font-size:12px}
+button.chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+.desc{font-size:13px;color:var(--mute);line-height:1.45}
+.stamp{position:absolute;top:70px;padding:6px 14px;border:3px solid;border-radius:10px;font-weight:800;font-size:22px;opacity:0;background:rgba(255,255,255,.85)}
+.stamp.l{left:16px;color:var(--ok);border-color:var(--ok);transform:rotate(-12deg)}.stamp.p{right:16px;color:var(--brand);border-color:var(--brand);transform:rotate(12deg)}
+.acts{display:flex;justify-content:center;gap:18px;margin-top:14px}
+.rb{width:56px;height:56px;border-radius:50%;background:var(--card);box-shadow:var(--shadow);font-size:24px;display:grid;place-items:center}
+.rb.go{width:66px;height:66px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;margin-top:-6px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:12px}.grow{flex:1;min-width:0}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--soft);flex:none}
+.btn{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-weight:700;border-radius:14px;padding:12px 16px;width:100%;text-align:center;display:block}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}.btn.sm{width:auto;padding:7px 12px;font-size:13px;border-radius:10px;display:inline-block}
+.btn:disabled{opacity:.5}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700;background:var(--okbg);color:var(--ok)}.pill.w{background:var(--warnbg);color:var(--warn)}.pill.r{background:var(--soft);color:var(--brand)}
+.score{font-weight:800;font-family:"Bricolage Grotesque",sans-serif}
+.bar{height:8px;background:var(--line);border-radius:9px;overflow:hidden;margin:6px 0 2px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.grid3 b{display:block;font-size:22px;font-family:"Bricolage Grotesque",sans-serif}.grid3 small{color:var(--mute);font-size:12px}
+label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;background:var(--soft);padding:10px 12px;border-radius:12px}
+.badge{display:flex;align-items:center;gap:10px;padding:10px;border:1px dashed var(--line);border-radius:14px;margin-top:8px}.badge.on{border:1px solid var(--ok);background:var(--okbg)}
+.badge .ic{font-size:26px;filter:grayscale(1);opacity:.5}.badge.on .ic{filter:none;opacity:1}
+.modal{position:absolute;inset:0;background:rgba(10,12,20,.72);display:grid;place-items:center;padding:20px;z-index:20}
+.sheet{background:var(--card);border-radius:24px;padding:24px 20px;width:100%;text-align:center}.sheet h2{font-size:28px;font-weight:800;color:var(--brand)}
+.toast{position:absolute;left:12px;right:12px;top:12px;background:#16181f;color:#fff;border-radius:16px;padding:12px 14px;z-index:30;box-shadow:var(--shadow)}
+.chat{display:flex;flex-direction:column;gap:6px;margin:10px 0;max-height:200px;overflow-y:auto}
+.msg{max-width:80%;padding:8px 12px;border-radius:14px;background:var(--bg);font-size:14px}.msg.me{align-self:flex-end;background:var(--brand);color:#fff}
+.empty{text-align:center;color:var(--mute);padding:36px 10px}
+.stars{display:flex;gap:6px;margin-top:8px}.stars button{flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const BASE = 'https://shiftpe-backend-fqm3.onrender.com';
+const CAT = {
+  cafe:{e:'☕',bg:'linear-gradient(135deg,#ffd9a8,#f4a261)',badge:'Verified Barista',name:'Cafe / Restaurant'},
+  edit:{e:'🎬',bg:'linear-gradient(135deg,#cfd8ff,#8aa0ff)',badge:'Trusted Editor',name:'Content / Editing'},
+  sales:{e:'🛍️',bg:'linear-gradient(135deg,#ffd0dc,#f58aa8)',badge:'Weekend Sales Pro',name:'Retail / Sales'},
+  event:{e:'📣',bg:'linear-gradient(135deg,#c9f2e3,#5fd0a5)',badge:'Event Star',name:'Events'}};
+const SKILLS = ['Billing','Customer service','Serving','Sales','Styling','Reels','CapCut','Photography','Communication','Hosting'];
+const DEMO = { lat: 22.7196, lng: 75.8577 };
+const MIN_STU = 4.2;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = (n) => '₹' + Number(n).toLocaleString('en-IN');
+const store = {
+  get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k){ try { localStorage.removeItem(k); } catch {} }
+};
+const jwtId = (t) => { try { return JSON.parse(atob(t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).id; } catch { return null; } };
+
+const S = { token:null, role:null, uid:null, screen:'login', tab:'swipe', toast:null, modal:null, roleSel:'student', otpSent:false,
+  me:null, biz:null, feed:[], fi:0, matches:[], open:null, msgs:[], jobs:[], apps:{}, openJob:null, minTrust:true, poll:null,
+  form:{ phone:'9000000001', otp:'', name:'', age:'', college:'', skills:[], avail:true, lat:DEMO.lat, lng:DEMO.lng,
+         ptitle:'', ppay:'600', phours:'6 PM - 10 PM', pcat:'cafe', pdesc:'', pskills:[], purgent:false, msg:'', late:'0' } };
+
+async function api(path, opts = {}) {
+  const h = { 'content-type': 'application/json' };
+  if (S.token) h.authorization = 'Bearer ' + S.token;
+  const slow = opts.quiet ? null : setTimeout(() => say('Server is waking up, this can take up to a minute…'), 4000);
+  try {
+    const r = await fetch(BASE + path, { method: opts.method || 'GET', headers: h, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    let d = null; try { d = await r.json(); } catch {}
+    if (!r.ok) { const e = new Error((d && d.error) || 'Request failed (' + r.status + ')'); e.status = r.status; throw e; }
+    return d;
+  } finally { if (slow) clearTimeout(slow); }
+}
+let toastT;
+function say(m) { S.toast = m; render(); clearTimeout(toastT); toastT = setTimeout(() => { S.toast = null; render(); }, 3800); }
+async function run(fn) {
+  try { await fn(); }
+  catch (e) { if (e.status === 401 && S.token) { logout(); say('Please log in again'); return; } say(e.message || 'Something went wrong'); }
+  render();
+}
+function logout() { store.del('shiftpe'); clearInterval(S.poll); Object.assign(S, { token:null, role:null, uid:null, screen:'login', otpSent:false, me:null, biz:null, feed:[], fi:0, matches:[], open:null, jobs:[], apps:{}, modal:null }); }
+
+/* ---------- data loaders ---------- */
+async function bootstrap() {
+  S.uid = jwtId(S.token);
+  if (S.role === 'student') {
+    S.me = await api('/students/me');
+    Object.assign(S.form, { name:S.me.name || '', age:S.me.age || '', college:S.me.college || '', skills:S.me.skills || [], avail:!!S.me.available_now });
+    if (!S.me.name || !S.me.college) { S.screen = 'setup'; return; }
+    S.screen = 'app'; S.tab = 'swipe'; await loadFeed();
+  } else {
+    S.biz = await api('/businesses/me'); S.form.name = S.biz.name || '';
+    if (!S.biz.name) { S.screen = 'setup'; return; }
+    S.screen = 'app'; S.tab = 'post';
+  }
+}
+async function loadFeed() {
+  try { S.feed = await api('/jobs/feed?radiusKm=10'); S.fi = 0; }
+  catch (e) { if (/location/i.test(e.message)) { S.screen = 'setup'; say('Set your location first'); } else throw e; }
+}
+async function loadMatches() { S.matches = await api('/matches'); }
+async function loadJobs() {
+  const key = 'shiftpe_jobs_' + S.uid;
+  try { S.jobs = await api('/jobs/mine'); }
+  catch { S.jobs = store.get(key) || []; }
+}
+async function loadApplicants(id) {
+  S.apps[id] = await api('/jobs/' + id + '/applicants?minTrust=' + (S.minTrust ? MIN_STU : 0));
+}
+async function enter(t) {
+  S.tab = t; clearInterval(S.poll); S.open = null;
+  if (t === 'swipe') await loadFeed();
+  if (t === 'matches') await loadMatches();
+  if (t === 'me') S.me = await api('/students/me');
+  if (t === 'post') S.biz = await api('/businesses/me');
+  if (t === 'jobs') await loadJobs();
+}
+async function openMatch(id) {
+  clearInterval(S.poll);
+  if (S.open === id) { S.open = null; return; }
+  S.open = id; S.msgs = await api('/matches/' + id + '/messages');
+  S.poll = setInterval(async () => {
+    if (S.tab !== 'matches' || !S.open) return;
+    try { S.msgs = await api('/matches/' + S.open + '/messages', { quiet:true }); const c = $('chat'); if (c) { c.innerHTML = chatHtml(); c.scrollTop = c.scrollHeight; } } catch {}
+  }, 6000);
+}
+
+/* ---------- views ---------- */
+function chips(list, sel, act) { return '<div class="chips">' + list.map((s) => '<button class="chip' + (sel.includes(s) ? ' on' : '') + '" data-a="' + act + '" data-v="' + esc(s) + '">' + esc(s) + '</button>').join('') + '</div>'; }
+function locBox() {
+  return '<label>Location</label><div class="two"><button class="btn ghost sm" data-a="geo">📍 Use my location</button><button class="btn ghost sm" data-a="demoloc">Use demo location</button></div><p class="x">Set: ' + Number(S.form.lat).toFixed(4) + ', ' + Number(S.form.lng).toFixed(4) + '. While testing, use the same option for both your student and business accounts.</p>';
+}
+function loginView() {
+  const st = S.roleSel === 'student';
+  return '<div style="padding-top:20px"><div class="kick">INDIA’S FASTEST WAY TO FIND PART-TIME JOBS</div><h1>Swipe. Work. Earn.</h1><p class="sub">Log in with your phone number.</p>'
+  + '<div class="seg" style="margin-bottom:14px"><button style="flex:1" class="' + (st ? 'on' : '') + '" data-a="setrole" data-v="student">I’m a student</button><button style="flex:1" class="' + (st ? '' : 'on') + '" data-a="setrole" data-v="business">I’m a business</button></div>'
+  + '<div class="panel"><label for="phone">Phone number</label><input id="phone" data-f="phone" inputmode="numeric" value="' + esc(S.form.phone) + '">'
+  + (S.otpSent ? '<label for="otp">OTP</label><input id="otp" data-f="otp" inputmode="numeric" value="' + esc(S.form.otp) + '"><p class="x">Test mode: the OTP is filled in for you. Real SMS comes later.</p><button class="btn" data-a="verify">Verify and continue</button>'
+               : '<button class="btn" style="margin-top:14px" data-a="sendotp">Send OTP</button>')
+  + '<p class="x">Testing alone? Use 9000000001 as a student and 9000000002 as a business. A phone number keeps the role it first signed up with.</p></div></div>';
+}
+function setupView() {
+  if (S.role === 'student') return '<h1>Set up your profile</h1><p class="sub">Businesses see this when you show interest.</p><div class="panel">'
+    + '<label for="name">Full name</label><input id="name" data-f="name" value="' + esc(S.form.name) + '">'
+    + '<div class="two"><div><label for="age">Age (18+)</label><input id="age" data-f="age" type="number" value="' + esc(S.form.age) + '"></div><div><label for="college">College</label><input id="college" data-f="college" value="' + esc(S.form.college) + '"></div></div>'
+    + '<label>Your skills</label>' + chips(SKILLS, S.form.skills, 'skill')
+    + '<div class="sw"><div><b>Available now</b><div class="x">Get urgent shift alerts nearby</div></div><input type="checkbox" data-f="avail" ' + (S.form.avail ? 'checked' : '') + ' aria-label="Available now"></div>'
+    + locBox() + '<button class="btn" style="margin-top:14px" data-a="savestudent">Save and start swiping</button></div>';
+  return '<h1>Set up your shop</h1><p class="sub">Students nearby will see your shifts.</p><div class="panel"><label for="name">Business name</label><input id="name" data-f="name" value="' + esc(S.form.name) + '">' + locBox() + '<button class="btn" style="margin-top:14px" data-a="savebiz">Save</button></div>';
+}
+function card(j, top) {
+  const c = CAT[j.category] || CAT.cafe;
+  return '<article class="job' + (top ? '' : ' back') + '"' + (top ? ' id="top"' : '') + '><div class="cover" style="background:' + c.bg + '">' + c.e + '<span class="tag' + (j.urgent ? ' u' : '') + '">' + (j.urgent ? '⚡ Urgent' : 'Normal') + '</span><span class="dist">' + esc(j.dist_km) + ' km away</span></div>'
+  + '<div class="jb"><h2>' + esc(j.title) + '</h2><div class="biz">' + esc(j.business_name || 'Business') + ' · ⭐ ' + Number(j.business_rating).toFixed(1) + ' trust</div>'
+  + '<div class="pay"><div><small>Pay</small><strong>' + money(j.effective_pay) + '</strong></div><div class="m"><small>Match score</small><strong>' + esc(j.match_score) + '%</strong></div></div>'
+  + (j.badge_bonus ? '<div><span class="pill">Badge bonus +15% applied</span></div>' : '')
+  + '<div class="x">🕒 ' + esc(j.hours_text || 'Flexible') + '</div><div class="chips">' + (j.skills || []).map((s) => '<span class="chip">' + esc(s) + '</span>').join('') + '</div><p class="desc">' + esc(j.description) + '</p></div>'
+  + (top ? '<span class="stamp l" id="sl">INTERESTED</span><span class="stamp p" id="sp">PASS</span>' : '') + '</article>';
+}
+function swipeView() {
+  const j = S.feed[S.fi], n = S.feed[S.fi + 1];
+  let h = '<div class="kick">NEAR YOU</div><h1>Pick your shift.</h1><p class="sub">' + Math.max(S.feed.length - S.fi, 0) + ' gigs in your radius. Businesses under 3.5★ are hidden.</p>';
+  if (!j) return h + '<div class="empty"><div style="font-size:48px">🎉</div><h3>You’re all caught up</h3><p>No shifts nearby right now. Ask a business to post one, then refresh.</p><button class="btn sm" data-a="refresh">Refresh</button></div>';
+  return h + '<div class="stack">' + (n ? card(n, 0) : '') + card(j, 1) + '</div>'
+    + '<div class="acts"><button class="rb" data-a="pass" aria-label="Pass">✕</button><button class="rb go" data-a="like" aria-label="Interested">♥</button><button class="rb" data-a="save" aria-label="Save">★</button></div>'
+    + (j.urgent ? '<button class="btn" style="margin-top:14px" data-a="claim">⚡ Claim this urgent shift now</button>' : '');
+}
+function chatHtml() { return S.msgs.length ? S.msgs.map((m) => '<div class="msg' + (m.sender_id === S.uid ? ' me' : '') + '">' + esc(m.body) + '</div>').join('') : '<div class="x">Say hello 👋</div>'; }
+function matchesView() {
+  if (!S.matches.length) return '<h1>Matches</h1><div class="empty"><div style="font-size:48px">💬</div><p>' + (S.role === 'student' ? 'No matches yet. Swipe right, then wait for a business to accept you.' : 'No matches yet. Accept a student from My shifts.') + '</p></div>';
+  const lab = { chat:'Chatting', confirmed:'Confirmed', completed:'Completed', cancelled:'Cancelled' };
+  return '<h1>Matches</h1><p class="sub">Chat, confirm and complete shifts.</p>' + S.matches.map((m) => {
+    const o = S.open === m.id, other = S.role === 'student' ? m.business_name : m.student_name, st = m.status;
+    let body = '';
+    if (o) {
+      body = '<div class="chat" id="chat">' + chatHtml() + '</div>';
+      if (st === 'chat' || st === 'confirmed') body += '<div class="row"><input data-f="msg" id="msg" placeholder="Type a message" aria-label="Message" value="' + esc(S.form.msg) + '"><button class="btn sm" data-a="send">Send</button></div>';
+      if (st === 'chat') body += '<button class="btn ghost" style="margin-top:8px" data-a="confirm">Confirm shift</button><button class="btn ghost" style="margin-top:8px" data-a="cancel">Back out (no penalty)</button>';
+      if (st === 'confirmed' && S.role === 'business') body += '<label for="late">Minutes the student was late</label><input id="late" data-f="late" type="number" min="0" value="' + esc(S.form.late) + '"><div class="two" style="margin-top:8px"><button class="btn" data-a="complete">Mark completed</button><button class="btn ghost" data-a="cancel">Cancel shift</button></div>';
+      if (st === 'confirmed' && S.role === 'student') body += '<button class="btn ghost" style="margin-top:8px" data-a="cancel">Cancel shift</button><p class="x">Cancelling a confirmed shift lowers your trust score.</p>';
+      if (st === 'completed') body += '<div class="x" style="margin-top:8px">Rate ' + (S.role === 'student' ? 'this business' : 'this student') + '</div><div class="stars">' + [1,2,3,4,5].map((n) => '<button data-a="rate" data-v="' + n + '">' + n + '★</button>').join('') + '</div>';
+    }
+    return '<div class="panel"><div class="row" data-a="open" data-id="' + m.id + '" style="cursor:pointer"><div class="av">' + ((CAT[m.category] || CAT.cafe).e) + '</div><div class="grow"><b>' + esc(m.title) + '</b><div class="x">' + esc(other) + ' · ' + money(m.pay) + '</div></div><span class="pill' + (st === 'completed' ? '' : st === 'cancelled' ? ' r' : ' w') + '">' + lab[st] + '</span></div>' + body + '</div>';
+  }).join('');
+}
+function profileView() {
+  const m = S.me; if (!m) return '';
+  const prog = m.skillProgress || [];
+  return '<div class="panel" style="text-align:center"><div class="av" style="margin:0 auto 8px;width:70px;height:70px;font-size:36px">🧑‍🎓</div><h2 style="font-size:24px">' + esc(m.name) + '</h2><div class="x">' + esc(m.college || '') + ' · Student</div></div>'
+  + (Number(m.rating) < MIN_STU ? '<div class="panel" style="background:var(--warnbg)"><b>⚠ Visibility reduced</b><div class="x">Your score is under ' + MIN_STU + ', so businesses using the reputation filter won’t see you.</div></div>' : '')
+  + '<div class="panel"><h3>Work reputation score</h3><div class="grid3" style="margin-top:10px"><div><b class="score">' + Number(m.rating).toFixed(1) + '</b><small>⭐ Trust</small></div><div><b>' + esc(m.ontime_pct) + '%</b><small>On time</small></div><div><b>' + esc(m.cancels) + '</b><small>Cancels</small></div></div><p class="x">Late arrivals and cancelled shifts lower this score.</p></div>'
+  + '<div class="panel"><h3>Skill unlock system</h3><p class="x">Finish 10 shifts in a skill to earn its badge. Badge holders are preferred by businesses and get +15% pay.</p>'
+  + Object.keys(CAT).map((k) => { const p = prog.find((x) => x.category === k), n = Math.min(p ? p.completed : 0, 10), on = p && p.unlocked;
+      return '<div class="badge' + (on ? ' on' : '') + '"><span class="ic">' + CAT[k].e + '</span><div class="grow"><b>' + CAT[k].badge + '</b> ' + (on ? '<span class="pill">Unlocked</span>' : '') + '<div class="bar"><i style="width:' + n * 10 + '%"></i></div><span class="x">' + n + ' / 10 shifts</span></div></div>'; }).join('') + '</div>'
+  + '<div class="panel"><div class="sw" style="margin:0"><div><b>Available now</b><div class="x">Get alerts for urgent shifts nearby</div></div><input type="checkbox" data-a="toggleavail" ' + (m.available_now ? 'checked' : '') + ' aria-label="Available now"></div></div>';
+}
+function postView() {
+  const b = S.biz || {};
+  const paid = b.plan_expires && new Date(b.plan_expires) > new Date();
+  return '<div class="kick">BUSINESS</div><h1>Hire in minutes.</h1><p class="sub">' + esc(b.name || '') + ' · ⭐ ' + Number(b.rating || 4.5).toFixed(1) + ' trust</p>'
+  + '<div class="panel"><div class="row"><div class="grow"><b>' + (paid ? 'Membership active' : 'Free listings left') + '</b><div class="x">' + (paid ? 'Unlimited shifts until ' + new Date(b.plan_expires).toLocaleDateString('en-IN') : 'Post your first 2 jobs for free.') + '</div></div>' + (paid ? '' : '<span class="score" style="font-size:30px;color:var(--brand)">' + esc(b.free_listings_left) + '</span>') + '</div></div>'
+  + '<div class="panel"><h3>Post a shift</h3><label for="ptitle">Role</label><input id="ptitle" data-f="ptitle" placeholder="e.g. Counter staff for evening rush" value="' + esc(S.form.ptitle) + '">'
+  + '<div class="two"><div><label for="ppay">Pay (₹)</label><input id="ppay" data-f="ppay" type="number" value="' + esc(S.form.ppay) + '"></div><div><label for="phours">Hours</label><input id="phours" data-f="phours" value="' + esc(S.form.phours) + '"></div></div>'
+  + '<label for="pcat">Category</label><select id="pcat" data-f="pcat">' + Object.keys(CAT).map((k) => '<option value="' + k + '"' + (S.form.pcat === k ? ' selected' : '') + '>' + CAT[k].name + '</option>').join('') + '</select>'
+  + '<label>Skills needed</label>' + chips(SKILLS, S.form.pskills, 'pskill')
+  + '<label for="pdesc">Description</label><textarea id="pdesc" data-f="pdesc" rows="2">' + esc(S.form.pdesc) + '</textarea>'
+  + '<div class="sw"><div><b>⚡ Urgent hiring mode</b><div class="x">Instantly notify nearby students</div></div><input type="checkbox" data-f="purgent" ' + (S.form.purgent ? 'checked' : '') + ' aria-label="Urgent hiring"></div>'
+  + '<button class="btn" style="margin-top:12px" data-a="post">' + (paid || Number(b.free_listings_left) > 0 ? 'Post shift' : 'Start hiring') + '</button></div>';
+}
+function jobsView() {
+  let h = '<h1>My shifts</h1><p class="sub">See who is interested and accept students.</p><div class="panel"><div class="sw" style="margin:0"><div><b>Hide students under ' + MIN_STU + '★</b><div class="x">Late and cancelling students are filtered out</div></div><input type="checkbox" data-a="mintrust" ' + (S.minTrust ? 'checked' : '') + ' aria-label="Reputation filter"></div></div>';
+  if (!S.jobs.length) return h + '<div class="empty">Post your first shift to see interested students here.</div>';
+  return h + S.jobs.map((j) => {
+    const a = S.apps[j.id], o = S.openJob === j.id;
+    let body = '';
+    if (o && a) body = (a.applicants.length ? a.applicants.map((s) => '<div class="row" style="margin-top:12px"><div class="av">🧑</div><div class="grow"><b>' + esc(s.name || 'Student') + '</b> ' + (s.has_badge ? '<span class="pill">Badge holder</span>' : '') + '<div class="x">⭐ ' + Number(s.rating).toFixed(1) + ' · ' + esc(s.ontime_pct) + '% on time · ' + esc(s.college || '') + '</div></div><button class="btn sm" data-a="accept" data-id="' + j.id + '" data-sid="' + s.id + '">Accept</button></div>').join('') : '<p class="x">No interested students yet.</p>')
+      + (a.hiddenByReputationFilter ? '<p class="x">' + a.hiddenByReputationFilter + ' student(s) hidden by the reputation filter.</p>' : '');
+    return '<div class="panel"><div class="row" data-a="openjob" data-id="' + j.id + '" style="cursor:pointer"><div class="av">' + ((CAT[j.category] || CAT.cafe).e) + '</div><div class="grow"><b>' + esc(j.title) + '</b><div class="x">' + money(j.pay) + ' · ' + esc(j.hours_text || '') + '</div></div>' + (j.urgent ? '<span class="pill r">⚡ Urgent</span>' : '') + '</div>' + body + '</div>';
+  }).join('');
+}
+
+function render() {
+  const keep = document.querySelector('main'), sc = keep ? keep.scrollTop : 0;
+  let body, nav = '';
+  if (S.screen === 'login') body = loginView();
+  else if (S.screen === 'setup') body = setupView();
+  else {
+    const tabs = S.role === 'student' ? [['swipe','🔥','Swipe'],['matches','💬','Matches'],['me','👤','Profile']] : [['post','➕','Post'],['jobs','👥','My shifts'],['matches','💬','Matches']];
+    body = ({ swipe:swipeView, matches:matchesView, me:profileView, post:postView, jobs:jobsView })[S.tab]();
+    nav = '<nav>' + tabs.map((t) => '<button data-a="tab" data-v="' + t[0] + '" class="' + (S.tab === t[0] ? 'on' : '') + '"><b>' + t[1] + '</b>' + t[2] + '</button>').join('') + '</nav>';
+  }
+  $('app').innerHTML = '<header><div class="logo"><i>S</i>ShiftPe</div>' + (S.token ? '<button class="chip" data-a="logout">Log out</button>' : '') + '</header><main>' + body + '</main>' + nav
+    + (S.toast ? '<div class="toast" role="status">' + esc(S.toast) + '</div>' : '')
+    + (S.modal === 'match' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">✨</div><h2>It’s a Shift Match!</h2><p>Your shift is confirmed. Open the chat to coordinate.</p><button class="btn" data-a="gomatches">Open chat</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Keep swiping</button></div></div>' : '')
+    + (S.modal === 'paywall' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">🔒</div><h2>2 free listings used</h2><p>Membership and listing charges apply after your free listings.</p><button class="btn" data-a="devplan">Test mode: activate 30-day membership</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Not now</button></div></div>' : '');
+  const m = document.querySelector('main'); if (m) m.scrollTop = sc;
+  bindDrag();
+}
+
+/* ---------- swipe gesture ---------- */
+function fly(dir) {
+  const t = $('top'); if (!t) return doSwipe(dir);
+  t.style.transition = 'transform .25s,opacity .25s'; t.style.transform = 'translateX(' + (dir === 'like' ? 500 : -500) + 'px) rotate(' + (dir === 'like' ? 25 : -25) + 'deg)'; t.style.opacity = 0;
+  setTimeout(() => run(() => doSwipe(dir)), 230);
+}
+async function doSwipe(dir) {
+  const j = S.feed[S.fi]; if (!j) return;
+  await api('/jobs/' + j.id + '/swipe', { method:'POST', body:{ direction:dir } });
+  S.fi++;
+  if (dir === 'like') say('Interest sent to ' + (j.business_name || 'the business') + '. You’ll match when they accept.');
+}
+function bindDrag() {
+  const t = $('top'); if (!t) return; let x0 = null, dx = 0;
+  t.onpointerdown = (e) => { x0 = e.clientX; t.setPointerCapture(e.pointerId); t.style.transition = 'none'; };
+  t.onpointermove = (e) => { if (x0 === null) return; dx = e.clientX - x0; t.style.transform = 'translateX(' + dx + 'px) rotate(' + dx / 20 + 'deg)'; $('sl').style.opacity = Math.max(0, dx / 100); $('sp').style.opacity = Math.max(0, -dx / 100); };
+  t.onpointerup = () => { if (x0 === null) return; x0 = null; if (dx > 90) fly('like'); else if (dx < -90) fly('pass'); else { t.style.transition = 'transform .2s'; t.style.transform = ''; $('sl').style.opacity = 0; $('sp').style.opacity = 0; } dx = 0; };
+}
+
+/* ---------- inputs and clicks ---------- */
+function onField(e) { const f = e.target.dataset.f; if (f) S.form[f] = e.target.type === 'checkbox' ? e.target.checked : e.target.value; }
+document.addEventListener('input', onField);
+document.addEventListener('change', onField);
+
+const toggle = (arr, v) => (arr.includes(v) ? arr.filter((x) => x !== v) : arr.concat(v));
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-a]'); if (!el) return;
+  const a = el.dataset.a, v = el.dataset.v, id = el.dataset.id;
+  const sync = () => { S.form.name = S.form.name; };
+  run(async () => {
+    if (a === 'setrole') { S.roleSel = v; S.form.phone = v === 'student' ? '9000000001' : '9000000002'; S.otpSent = false; }
+    else if (a === 'sendotp') {
+      const d = await api('/auth/request-otp', { method:'POST', body:{ phone:S.form.phone.trim(), role:S.roleSel } });
+      S.otpSent = true; if (d.devOtp) S.form.otp = d.devOtp;
+    }
+    else if (a === 'verify') {
+      const d = await api('/auth/verify-otp', { method:'POST', body:{ phone:S.form.phone.trim(), otp:S.form.otp.trim(), role:S.roleSel } });
+      S.token = d.token; S.role = d.user.role; store.set('shiftpe', { token:S.token, role:S.role });
+      if (S.role !== S.roleSel) say('This number is already registered as a ' + S.role + '.');
+      await bootstrap();
+    }
+    else if (a === 'logout') logout();
+    else if (a === 'skill') S.form.skills = toggle(S.form.skills, v);
+    else if (a === 'pskill') S.form.pskills = toggle(S.form.pskills, v);
+    else if (a === 'demoloc') { S.form.lat = DEMO.lat; S.form.lng = DEMO.lng; }
+    else if (a === 'geo') {
+      if (!navigator.geolocation) throw new Error('Location is not supported on this device');
+      await new Promise((ok, no) => navigator.geolocation.getCurrentPosition((p) => { S.form.lat = p.coords.latitude; S.form.lng = p.coords.longitude; ok(); }, () => no(new Error('Location blocked. Allow it in the browser or use the demo location.'))));
+    }
+    else if (a === 'savestudent') {
+      const f = S.form, age = Number(f.age);
+      if (!f.name.trim() || !f.college.trim()) throw new Error('Enter your name and college');
+      if (!(age >= 18)) throw new Error('You must be 18 or above');
+      await api('/students/me', { method:'PUT', body:{ name:f.name.trim(), age, college:f.college.trim(), skills:f.skills, lat:f.lat, lng:f.lng, availableNow:!!f.avail } });
+      S.me = await api('/students/me'); S.screen = 'app'; S.tab = 'swipe'; await loadFeed();
+    }
+    else if (a === 'savebiz') {
+      if (!S.form.name.trim()) throw new Error('Enter your business name');
+      await api('/businesses/me', { method:'PUT', body:{ name:S.form.name.trim(), lat:S.form.lat, lng:S.form.lng } });
+      S.biz = await api('/businesses/me'); S.screen = 'app'; S.tab = 'post';
+    }
+    else if (a === 'tab') await enter(v);
+    else if (a === 'like' || a === 'pass') return fly(a);
+    else if (a === 'save') await doSwipe('save');
+    else if (a === 'refresh') await loadFeed();
+    else if (a === 'claim') { const j = S.feed[S.fi]; await api('/jobs/' + j.id + '/claim', { method:'POST' }); S.fi++; S.modal = 'match'; }
+    else if (a === 'closemodal') S.modal = null;
+    else if (a === 'gomatches') { S.modal = null; await enter('matches'); }
+    else if (a === 'open') await openMatch(Number(id));
+    else if (a === 'send') {
+      const body = S.form.msg.trim(); if (!body) return;
+      await api('/matches/' + S.open + '/messages', { method:'POST', body:{ body } });
+      S.form.msg = ''; S.msgs = await api('/matches/' + S.open + '/messages');
+    }
+    else if (a === 'confirm') { await api('/matches/' + S.open + '/confirm', { method:'POST' }); await loadMatches(); say('Shift confirmed ✅'); }
+    else if (a === 'complete') {
+      const d = await api('/matches/' + S.open + '/complete', { method:'POST', body:{ lateMinutes:Number(S.form.late) || 0 } });
+      await loadMatches(); say(d.badgeUnlocked ? '🏅 Badge unlocked for the student: ' + d.badgeUnlocked : 'Shift completed. Scores updated.');
+    }
+    else if (a === 'cancel') {
+      const d = await api('/matches/' + S.open + '/cancel', { method:'POST' });
+      await loadMatches(); say(d.reputationPenalty ? 'Shift cancelled. Your trust score was reduced.' : 'You backed out of this match.');
+    }
+    else if (a === 'rate') { await api('/matches/' + S.open + '/rate', { method:'POST', body:{ stars:Number(v) } }); say('Thanks for rating!'); }
+    else if (a === 'toggleavail') { S.me = Object.assign(S.me, { available_now:el.checked }); await api('/students/me', { method:'PUT', body:{ skills:S.me.skills || [], availableNow:el.checked } }); say(el.checked ? 'You’ll get urgent shift alerts' : 'Urgent alerts off'); }
+    else if (a === 'post') {
+      const f = S.form;
+      if (!f.ptitle.trim()) throw new Error('Add a role name first');
+      try {
+        const d = await api('/jobs', { method:'POST', body:{ title:f.ptitle.trim(), category:f.pcat, pay:Number(f.ppay) || 0, hoursText:f.phours, skills:f.pskills, description:f.pdesc, urgent:!!f.purgent } });
+        const key = 'shiftpe_jobs_' + S.uid, list = (store.get(key) || []); list.unshift({ id:d.job.id, title:d.job.title, category:f.pcat, pay:d.job.pay, hours_text:f.phours, urgent:d.job.urgent }); store.set(key, list);
+        Object.assign(S.form, { ptitle:'', pdesc:'', pskills:[], purgent:false });
+        await enter('jobs'); say(d.job.urgent ? '⚡ Urgent alert sent to ' + d.notifiedStudents + ' nearby student(s)' : 'Shift posted');
+      } catch (err) {
+        if (err.status === 402) { S.modal = 'paywall'; S.biz = await api('/businesses/me'); }
+        else if (/location/i.test(err.message)) { S.screen = 'setup'; throw err; }
+        else throw err;
+      }
+    }
+    else if (a === 'devplan') { await api('/billing/dev-activate', { method:'POST' }); S.modal = null; S.biz = await api('/businesses/me'); say('Membership active for 30 days (test mode)'); }
+    else if (a === 'openjob') { const n = Number(id); if (S.openJob === n) S.openJob = null; else { S.openJob = n; await loadApplicants(n); } }
+    else if (a === 'mintrust') { S.minTrust = el.checked; if (S.openJob) await loadApplicants(S.openJob); }
+    else if (a === 'accept') { await api('/jobs/' + id + '/accept/' + el.dataset.sid, { method:'POST' }); await loadApplicants(Number(id)); say('Matched! Open the Matches tab to chat.'); }
+  });
+});
+
+/* ---------- start ---------- */
+(function init() {
+  const s = store.get('shiftpe');
+  render();
+  if (s && s.token) { S.token = s.token; S.role = s.role; S.roleSel = s.role; run(async () => { await bootstrap(); }); }
+})();
+</script>
+</body>
+</html>
