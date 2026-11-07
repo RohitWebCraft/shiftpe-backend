@@ -250,8 +250,8 @@ async function enter(t) {
   if (t === 'jobs') await loadJobs();
 }
 async function openMatch(id) {
-  clearInterval(S.poll);
-  if (S.open === id) { S.open = null; return; }
+  id = String(id); clearInterval(S.poll);
+  if (String(S.open) === id) { S.open = null; return; }
   S.open = id; S.msgs = await api('/matches/' + id + '/messages');
   S.poll = setInterval(async () => {
     if (S.tab !== 'matches' || !S.open) return;
@@ -313,12 +313,12 @@ const QUICK = {
   en:{ student:['How many hours is the work?','When should I come?','Where is the shop?','I have finished the work ✅'], business:['Please come at the time we discussed.','Please bring your ID card.','Thank you, the work is done.'] } };
 function quickHtml() { const q = QUICK[S.lang === 'hi' ? 'hi' : 'en'][S.role] || []; return '<div class="chips" style="margin-top:8px">' + q.map((t, i) => '<button class="chip" data-a="quick" data-v="' + i + '">' + esc(t) + '</button>').join('') + '</div>'; }
 function stepsHtml(st) { if (st === 'cancelled') return ''; const i = { chat:0, confirmed:1, completed:2 }[st]; return '<div class="steps">' + ['Matched','Confirmed','Completed'].map((l, n) => '<span class="' + (n <= i ? 'on' : '') + '">' + l + '</span>').join('') + '</div>'; }
-function chatHtml() { return S.msgs.length ? S.msgs.map((m) => '<div class="msg' + (m.sender_id === S.uid ? ' me' : '') + '">' + esc(m.body) + '</div>').join('') : '<div class="x">Say hello 👋</div>'; }
+function chatHtml() { return S.msgs.length ? S.msgs.map((m) => '<div class="msg' + (String(m.sender_id) === String(S.uid) ? ' me' : '') + '">' + esc(m.body) + '</div>').join('') : '<div class="x">Say hello 👋</div>'; }
 function matchesView() {
   if (!S.matches.length) return '<h1>Matches</h1><div class="empty"><div style="font-size:48px">💬</div><p>' + (S.role === 'student' ? 'No matches yet. Swipe right, then wait for a business to accept you.' : 'No matches yet. Accept a student from My shifts.') + '</p></div>';
   const lab = { chat:'Chatting', confirmed:'Confirmed', completed:'Completed', cancelled:'Cancelled' };
   return '<h1>Matches</h1><p class="sub">Chat, confirm and complete shifts.</p>' + S.matches.map((m) => {
-    const o = S.open === m.id, other = S.role === 'student' ? m.business_name : m.student_name, st = m.status;
+    const o = String(S.open) === String(m.id), other = S.role === 'student' ? m.business_name : m.student_name, st = m.status;
     let body = '';
     if (o) {
       body = '<div class="note"><b>The shop has fixed ' + money(m.pay) + ' for this shift. It will not pay more than this.</b><br>Discuss the work timing and details here. The payment is settled between you two.</div><div class="chat" id="chat">' + chatHtml() + '</div>';
@@ -361,7 +361,7 @@ function jobsView() {
   let h = '<h1>My shifts</h1><p class="sub">See who is interested and accept students.</p><div class="panel"><div class="sw" style="margin:0"><div><b>Hide students under ' + MIN_STU + '★</b><div class="x">Late and cancelling students are filtered out</div></div><input type="checkbox" data-a="mintrust" ' + (S.minTrust ? 'checked' : '') + ' aria-label="Reputation filter"></div></div>';
   if (!S.jobs.length) return h + '<div class="empty">Post your first shift to see interested students here.</div>';
   return h + S.jobs.map((j) => {
-    const a = S.apps[j.id], o = S.openJob === j.id;
+    const a = S.apps[j.id], o = String(S.openJob) === String(j.id);
     let body = '';
     if (o && a) body = (a.applicants.length ? a.applicants.map((s) => '<div class="row" style="margin-top:12px"><div class="av">🧑</div><div class="grow"><b>' + esc(s.name || 'Student') + '</b> ' + (s.has_badge ? '<span class="pill">Badge holder</span>' : '') + '<div class="x">⭐ ' + Number(s.rating).toFixed(1) + ' · ' + esc(s.ontime_pct) + '% on time · ' + esc(s.college || '') + '</div></div><button class="btn sm" data-a="accept" data-id="' + j.id + '" data-sid="' + s.id + '">Accept</button></div>').join('') : '<p class="x">No interested students yet.</p>')
       + (a.hiddenByReputationFilter ? '<p class="x">' + a.hiddenByReputationFilter + ' student(s) hidden by the reputation filter.</p>' : '');
@@ -460,7 +460,7 @@ document.addEventListener('click', (e) => {
     else if (a === 'claim') { const j = S.feed[S.fi]; await api('/jobs/' + j.id + '/claim', { method:'POST' }); S.fi++; S.modal = 'match'; }
     else if (a === 'closemodal') S.modal = null;
     else if (a === 'gomatches') { S.modal = null; await enter('matches'); if (S.matches.length) await openMatch(S.matches[0].id); }
-    else if (a === 'open') await openMatch(Number(id));
+    else if (a === 'open') await openMatch(id);
     else if (a === 'quick') {
       const body = (QUICK[S.lang === 'hi' ? 'hi' : 'en'][S.role] || [])[Number(v)]; if (!body) return;
       await api('/matches/' + S.open + '/messages', { method:'POST', body:{ body } }); S.msgs = await api('/matches/' + S.open + '/messages');
@@ -496,9 +496,9 @@ document.addEventListener('click', (e) => {
       }
     }
     else if (a === 'devplan') { await api('/billing/dev-activate', { method:'POST' }); S.modal = null; S.biz = await api('/businesses/me'); say('Membership active for 30 days (test mode)'); }
-    else if (a === 'openjob') { const n = Number(id); if (S.openJob === n) S.openJob = null; else { S.openJob = n; await loadApplicants(n); } }
+    else if (a === 'openjob') { const n = String(id); if (String(S.openJob) === n) S.openJob = null; else { S.openJob = n; await loadApplicants(n); } }
     else if (a === 'mintrust') { S.minTrust = el.checked; if (S.openJob) await loadApplicants(S.openJob); }
-    else if (a === 'accept') { const d = await api('/jobs/' + id + '/accept/' + el.dataset.sid, { method:'POST' }); await loadApplicants(Number(id)); await enter('matches'); await openMatch(d.matchId); say('Matched! You can chat now.'); }
+    else if (a === 'accept') { const d = await api('/jobs/' + id + '/accept/' + el.dataset.sid, { method:'POST' }); await loadApplicants(id); await enter('matches'); await openMatch(d.matchId); say('Matched! You can chat now.'); }
   });
 });
 
