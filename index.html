@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ShiftPe – Swipe. Work. Earn.</title>
+<meta name="theme-color" content="#f0455a">
+<meta name="description" content="ShiftPe: part-time work for students in Satna, Panna and nearby towns.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22lg%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23f0455a%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23ff7a59%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%2264%22%20height=%2264%22%20rx=%2216%22%20fill=%22url%28%23lg%29%22/%3E%3Crect%20x=%2214%22%20y=%2212%22%20width=%2234%22%20height=%2242%22%20rx=%227%22%20fill=%22%23fff%22%20opacity=%22.45%22%20transform=%22rotate%28-10%2031%2033%29%22/%3E%3Crect%20x=%2218%22%20y=%2212%22%20width=%2234%22%20height=%2242%22%20rx=%227%22%20fill=%22%23fff%22%20transform=%22rotate%287%2035%2033%29%22/%3E%3Cpath%20d=%22M27%2034l6%206%2011-13%22%20fill=%22none%22%20stroke=%22%23f0455a%22%20stroke-width=%225%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%20transform=%22rotate%287%2035%2033%29%22/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f4f6fb;--card:#fff;--ink:#16181f;--mute:#6b7080;--line:#e6e9f2;--brand:#f0455a;--brand2:#ff7a59;--soft:#fdeaed;--ok:#15935f;--okbg:#e2f6ec;--warn:#b86b00;--warnbg:#fff1d9;--shadow:0 10px 30px rgba(30,40,80,.12);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -68,6 +72,8 @@ input[type=checkbox]{width:22px;height:22px;accent-color:var(--brand)}
 .msg{max-width:80%;padding:8px 12px;border-radius:14px;background:var(--bg);font-size:14px}.msg.me{align-self:flex-end;background:var(--brand);color:#fff}
 .empty{text-align:center;color:var(--mute);padding:36px 10px}
 .stars{display:flex;gap:6px;margin-top:8px}.stars button{flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700}
+.steps{display:flex;gap:6px;margin-top:10px}.steps span{flex:1;text-align:center;font-size:11px;font-weight:600;padding:5px 0;border-radius:99px;background:var(--bg);color:var(--mute)}.steps span.on{background:var(--okbg);color:var(--ok)}
+.note{background:var(--warnbg);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px;line-height:1.45}.note.ok{background:var(--okbg);color:var(--ok);font-weight:600}
 </style>
 </head>
 <body>
@@ -93,6 +99,7 @@ const TOWNS = [
   {k:'satna',name:'Satna',lat:24.58,lng:80.83},{k:'nagod',name:'Nagod',lat:24.57,lng:80.60},{k:'maihar',name:'Maihar',lat:24.27,lng:80.76},
   {k:'panna',name:'Panna',lat:24.72,lng:80.18},{k:'ajaigarh',name:'Ajaigarh',lat:24.90,lng:80.26}];
 const MIN_STU = 4.2;
+const LOGO = (n) => '<svg width="' + n + '" height="' + n + '" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f0455a"/><stop offset="1" stop-color="#ff7a59"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><rect x="14" y="12" width="34" height="42" rx="7" fill="#fff" opacity=".45" transform="rotate(-10 31 33)"/><rect x="18" y="12" width="34" height="42" rx="7" fill="#fff" transform="rotate(7 35 33)"/><path d="M27 34l6 6 11-13" fill="none" stroke="#f0455a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(7 35 33)"/></svg>';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -118,7 +125,7 @@ const HI = Object.assign(Object.create(null), {
 'Satna':'सतना','Nagod':'नागौद','Maihar':'मैहर','Panna':'पन्ना','Ajaigarh':'अजयगढ़',
 'Save and start swiping':'सेव करें और स्वाइप शुरू करें','Set up your shop':'अपनी दुकान जोड़ें','Students nearby will see your shifts.':'पास के स्टूडेंट आपके काम देख सकेंगे।','Business name':'दुकान / बिज़नेस का नाम','Save':'सेव करें',
 'Swipe':'स्वाइप','Matches':'मैच','Profile':'प्रोफ़ाइल','Post':'काम डालें','My shifts':'मेरे काम',
-'NEAR YOU':'आपके पास','Pick your shift.':'अपना काम चुनें।','Distance':'दूरी','Normal':'सामान्य','⚡ Urgent':'⚡ ज़रूरी','Match score':'मैच स्कोर','Pay':'पैसे','Badge bonus +15% applied':'बैज बोनस +15% जुड़ा',
+'NEAR YOU':'आपके पास','Pick your shift.':'अपना काम चुनें।','Distance':'दूरी','Normal':'सामान्य','⚡ Urgent':'⚡ ज़रूरी','Match score':'मैच स्कोर','Pay':'पैसे','Fixed pay':'तय पैसे','Badge holder: shopkeepers pick you first':'बैज वाले: दुकानदार आपको पहले चुनते हैं','Matched':'मैच हुआ',
 'INTERESTED':'पसंद','PASS':'छोड़ें','Pass':'छोड़ें','Interested':'पसंद','⚡ Claim this urgent shift now':'⚡ यह ज़रूरी काम अभी लें','You’re all caught up':'आपने सब देख लिया',
 'No shifts nearby right now. Ask a business to post one, then refresh.':'अभी पास में कोई काम नहीं है। किसी दुकान से काम डालने को कहें, फिर रिफ्रेश करें।','Refresh':'रिफ्रेश',
 'Chat, confirm and complete shifts.':'चैट करें, काम पक्का करें और पूरा करें।','Chatting':'चैट चालू','Confirmed':'पक्का','Completed':'पूरा हुआ','Cancelled':'रद्द',
@@ -127,7 +134,7 @@ const HI = Object.assign(Object.create(null), {
 'Minutes the student was late':'स्टूडेंट कितने मिनट देर से आया','Mark completed':'पूरा हुआ चिह्नित करें','Cancel shift':'काम रद्द करें','Cancelling a confirmed shift lowers your trust score.':'पक्का काम रद्द करने पर आपका भरोसा-स्कोर घटता है।',
 'Rate this business':'इस दुकान को रेटिंग दें','Rate this student':'इस स्टूडेंट को रेटिंग दें',
 'Work reputation score':'काम का भरोसा-स्कोर','⭐ Trust':'⭐ भरोसा','On time':'समय पर','Cancels':'रद्द','Late arrivals and cancelled shifts lower this score.':'देर से आने और काम रद्द करने पर यह स्कोर घटता है।',
-'Skill unlock system':'हुनर बैज सिस्टम','Finish 10 shifts in a skill to earn its badge. Badge holders are preferred by businesses and get +15% pay.':'किसी तरह के काम में 10 शिफ्ट पूरी करें और उसका बैज पाएँ। बैज वालों को दुकान वाले पहले चुनते हैं और +15% ज़्यादा पैसे मिलते हैं।',
+'Skill unlock system':'हुनर बैज सिस्टम','Finish 10 shifts in a skill to earn its badge. Badge holders are preferred by businesses.':'किसी तरह के काम में 10 शिफ्ट पूरी करें और उसका बैज पाएँ। बैज वालों को दुकान वाले पहले चुनते हैं।',
 'Unlocked':'मिल गया','⚠ Visibility reduced':'⚠ आप कम दिखेंगे','Your score is under 4.2, so businesses using the reputation filter won’t see you.':'आपका स्कोर 4.2 से कम है, इसलिए भरोसा-फ़िल्टर लगाने वाली दुकानें आपको नहीं देख पाएँगी।',
 'BUSINESS':'दुकान / बिज़नेस','Hire in minutes.':'मिनटों में स्टाफ़ पाएँ।','Free listings left':'बचे हुए फ़्री काम','Post your first 2 jobs for free.':'पहले 2 काम मुफ़्त डालें।','Membership active':'मेंबरशिप चालू है',
 'Post a shift':'काम डालें','Role':'काम का नाम','e.g. Helper for festival rush at my shop':'जैसे: त्योहार की भीड़ में दुकान पर हेल्पर','Pay for the shift (₹)':'इस काम के पैसे (₹)','e.g. 300':'जैसे: 300','Hours':'समय',
@@ -149,7 +156,15 @@ const HI = Object.assign(Object.create(null), {
 'ShiftPe is for users 18 and above':'ShiftPe 18 साल या उससे ज़्यादा उम्र वालों के लिए है','title, category and pay are required':'काम का नाम, किस्म और पैसे ज़रूरी हैं','Free listings used. Membership and listing charges apply.':'फ़्री काम पूरे हो गए। अब मेंबरशिप और लिस्टिंग चार्ज लगेगा।',
 'This urgent shift is no longer open':'यह ज़रूरी काम अब खुला नहीं है','Your trust score is too low to claim urgent shifts':'ज़रूरी काम लेने के लिए आपका भरोसा-स्कोर कम है','Already claimed':'यह पहले ही ले लिया गया','Job not found':'काम नहीं मिला','This student has not shown interest':'इस स्टूडेंट ने रुचि नहीं दिखाई',
 'Already matched':'पहले से मैच हो चुका है','Match not found':'मैच नहीं मिला','Shift must be confirmed first':'पहले काम पक्का करना होगा','Only the business can complete a shift':'काम पूरा सिर्फ़ दुकान वाला चिह्नित कर सकता है','You can rate after the shift is completed':'काम पूरा होने के बाद ही रेटिंग दे सकते हैं',
-'stars must be 1 to 5':'रेटिंग 1 से 5 के बीच होनी चाहिए','Already rated':'आप पहले ही रेटिंग दे चुके हैं','Message is empty':'संदेश खाली है','Pilot code':'पायलट कोड','Ask the person who invited you for this code.':'यह कोड आपको जिसने बुलाया है, उनसे पूछें।','Invalid pilot code':'पायलट कोड गलत है','Server error':'सर्वर में गड़बड़ी'
+'stars must be 1 to 5':'रेटिंग 1 से 5 के बीच होनी चाहिए','Already rated':'आप पहले ही रेटिंग दे चुके हैं','Message is empty':'संदेश खाली है','Next: chat with the shop owner and wait for them to confirm the shift.':'अगला कदम: दुकान वाले से चैट करें और काम पक्का होने का इंतज़ार करें।',
+'Next: chat with the student, then tap “Confirm shift”.':'अगला कदम: स्टूडेंट से चैट करें, फिर "काम पक्का करें" दबाएँ।',
+'Your shift is confirmed. The shop owner marks it completed after the work is done.':'आपका काम पक्का है। काम खत्म होने पर दुकान वाला उसे "पूरा हुआ" चिह्नित करेगा।',
+'When the work is done, tap “Mark completed”.':'काम खत्म होने पर "पूरा हुआ चिह्नित करें" दबाएँ।',
+'✅ Shift completed! Your trust score and badge progress are updated.':'✅ काम पूरा हुआ! आपका भरोसा-स्कोर और बैज की प्रगति अपडेट हो गई।',
+'✅ Shift completed. Please rate the student.':'✅ काम पूरा हुआ। कृपया स्टूडेंट को रेटिंग दें।','This shift was cancelled.':'यह काम रद्द हो गया था।','💬 Open chat':'💬 चैट खोलें',
+'Completed shifts':'पूरे हुए काम','Earned (listed pay)':'कमाई (दी गई पे के हिसाब से)','Upcoming':'आने वाले काम',
+'Matched! You can chat now.':'मैच हो गया! अब आप चैट कर सकते हैं।','🔔 You have a new match update. Open the Matches tab.':'🔔 आपके मैच में नई अपडेट है। "मैच" टैब खोलें।',
+'Fixed pay for this shift (₹)':'इस काम के तय पैसे (₹)','Students see this as the fixed pay. You won’t have to pay more than this.':'स्टूडेंट इसे तय पैसे के रूप में देखेंगे। आपको इससे ज़्यादा नहीं देना होगा।','Discuss the work timing and details here. The payment is settled between you two.':'काम का समय और बातें यहीं तय करें। पैसों का लेन-देन आप दोनों आपस में करेंगे।','Pilot code':'पायलट कोड','Ask the person who invited you for this code.':'यह कोड आपको जिसने बुलाया है, उनसे पूछें।','Invalid pilot code':'पायलट कोड गलत है','Server error':'सर्वर में गड़बड़ी'
 });
 const HIP = [
 [/^(\d+) gigs in your radius\. Businesses under 3\.5★ are hidden\.$/,'$1 काम आपके आस-पास हैं। 3.5★ से कम भरोसे वाली दुकानें नहीं दिखतीं।'],
@@ -158,7 +173,7 @@ const HIP = [
 [/^⭐ ([\d.]+) · (\d+)% on time · (.*)$/,'⭐ $1 · $2% समय पर · $3'],[/^(.*) · Student$/,'$1 · स्टूडेंट'],[/^Unlimited shifts until (.*)$/,'$1 तक अनलिमिटेड काम'],
 [/^Interest sent to (.*)\. You’ll match when they accept\.$/,'$1 को आपकी रुचि भेज दी गई। उनके मंज़ूर करने पर मैच होगा।'],[/^🏅 Badge unlocked for the student: (.*)$/,'🏅 स्टूडेंट को बैज मिला: $1'],
 [/^⚡ Urgent alert sent to (\d+) nearby student\(s\)$/,'⚡ पास के $1 स्टूडेंट को ज़रूरी अलर्ट भेजा गया'],[/^This number is already registered as a (student|business)\.$/,'यह नंबर पहले से "$1" रोल में जुड़ा है।'],
-[/^Only (students|businesses) can do this$/,'आपके रोल के लिए यह काम उपलब्ध नहीं है।'],[/^Shift is already (.*)$/,'यह काम पहले से "$1" है।'],[/^Request failed \((\d+)\)$/,'रिक्वेस्ट नहीं हो पाई ($1)']];
+[/^Only (students|businesses) can do this$/,'आपके रोल के लिए यह काम उपलब्ध नहीं है।'],[/^Shift is already (.*)$/,'यह काम पहले से "$1" है।'],[/^The shop has fixed (₹[\d,]+) for this shift\. It will not pay more than this\.$/,'दुकानदार ने इस काम के $1 तय किए हैं। इससे ज़्यादा नहीं मिलेंगे।'],[/^Work completed ✅ Agreed pay: (₹[\d,]+)$/,'काम पूरा हुआ ✅ तय पैसे: $1'],[/^Request failed \((\d+)\)$/,'रिक्वेस्ट नहीं हो पाई ($1)']];
 function tr(t) {
   if (S.lang !== 'hi') return t;
   const k = t.trim(); if (!k) return t;
@@ -215,7 +230,9 @@ async function loadFeed() {
   try { S.feed = await api('/jobs/feed?radiusKm=' + S.radius); S.fi = 0; }
   catch (e) { if (/location/i.test(e.message)) { S.screen = 'setup'; say('Set your location first'); } else throw e; }
 }
-async function loadMatches() { S.matches = await api('/matches'); }
+let msig = null;
+const sigOf = (l) => l.map((x) => x.id + ':' + x.status).join(',');
+async function loadMatches() { S.matches = await api('/matches'); msig = sigOf(S.matches); S.unread = false; }
 async function loadJobs() {
   const key = 'shiftpe_jobs_' + S.uid;
   try { S.jobs = await api('/jobs/mine'); }
@@ -228,7 +245,7 @@ async function enter(t) {
   S.tab = t; clearInterval(S.poll); S.open = null;
   if (t === 'swipe') await loadFeed();
   if (t === 'matches') await loadMatches();
-  if (t === 'me') S.me = await api('/students/me');
+  if (t === 'me') { S.me = await api('/students/me'); await loadMatches(); }
   if (t === 'post') S.biz = await api('/businesses/me');
   if (t === 'jobs') await loadJobs();
 }
@@ -250,7 +267,7 @@ function locBox() {
 }
 function loginView() {
   const st = S.roleSel === 'student';
-  return '<div style="padding-top:20px"><div class="kick">PART-TIME WORK IN YOUR TOWN · SATNA · PANNA · NEARBY</div><h1>Swipe. Work. Earn.</h1><p class="sub">Log in with your phone number.</p>'
+  return '<div style="padding-top:20px">' + LOGO(64) + '<div class="kick" style="margin-top:12px">PART-TIME WORK IN YOUR TOWN · SATNA · PANNA · NEARBY</div><h1>Swipe. Work. Earn.</h1><p class="sub">Log in with your phone number.</p>'
   + '<div class="seg" style="margin-bottom:14px"><button style="flex:1" class="' + (st ? 'on' : '') + '" data-a="setrole" data-v="student">I’m a student</button><button style="flex:1" class="' + (st ? '' : 'on') + '" data-a="setrole" data-v="business">I’m a business</button></div>'
   + '<div class="panel"><label for="phone">Phone number</label><input id="phone" data-f="phone" inputmode="numeric" value="' + esc(S.form.phone) + '">'
   + '<label for="pilot">Pilot code</label><input id="pilot" data-f="pilot" autocomplete="off" value="' + esc(S.form.pilot) + '"><p class="x">Ask the person who invited you for this code.</p>'
@@ -271,8 +288,8 @@ function card(j, top) {
   const c = CAT[j.category] || CAT.cafe;
   return '<article class="job' + (top ? '' : ' back') + '"' + (top ? ' id="top"' : '') + '><div class="cover" style="background:' + c.bg + '">' + c.e + '<span class="tag' + (j.urgent ? ' u' : '') + '">' + (j.urgent ? '⚡ Urgent' : 'Normal') + '</span><span class="dist">' + esc(j.dist_km) + ' km away</span></div>'
   + '<div class="jb"><h2>' + esc(j.title) + '</h2><div class="biz">' + esc(j.business_name || 'Business') + ' · ⭐ ' + Number(j.business_rating).toFixed(1) + ' trust</div>'
-  + '<div class="pay"><div><small>Pay</small><strong>' + money(j.effective_pay) + '</strong></div><div class="m"><small>Match score</small><strong>' + esc(j.match_score) + '%</strong></div></div>'
-  + (j.badge_bonus ? '<div><span class="pill">Badge bonus +15% applied</span></div>' : '')
+  + '<div class="pay"><div><small>Fixed pay</small><strong>' + money(j.pay) + '</strong></div><div class="m"><small>Match score</small><strong>' + esc(j.match_score) + '%</strong></div></div>'
+  + (j.badge_bonus ? '<div><span class="pill">Badge holder: shopkeepers pick you first</span></div>' : '')
   + '<div class="x">🕒 ' + esc(j.hours_text || 'Flexible') + '</div><div class="chips">' + (j.skills || []).map((s) => '<span class="chip">' + esc(s) + '</span>').join('') + '</div><p class="desc">' + esc(j.description) + '</p></div>'
   + (top ? '<span class="stamp l" id="sl">INTERESTED</span><span class="stamp p" id="sp">PASS</span>' : '') + '</article>';
 }
@@ -284,6 +301,18 @@ function swipeView() {
     + '<div class="acts"><button class="rb" data-a="pass" aria-label="Pass">✕</button><button class="rb go" data-a="like" aria-label="Interested">♥</button><button class="rb" data-a="save" aria-label="Save">★</button></div>'
     + (j.urgent ? '<button class="btn" style="margin-top:14px" data-a="claim">⚡ Claim this urgent shift now</button>' : '');
 }
+function hint(st) {
+  const stu = S.role === 'student';
+  if (st === 'chat') return stu ? 'Next: chat with the shop owner and wait for them to confirm the shift.' : 'Next: chat with the student, then tap “Confirm shift”.';
+  if (st === 'confirmed') return stu ? 'Your shift is confirmed. The shop owner marks it completed after the work is done.' : 'When the work is done, tap “Mark completed”.';
+  if (st === 'completed') return stu ? '✅ Shift completed! Your trust score and badge progress are updated.' : '✅ Shift completed. Please rate the student.';
+  return 'This shift was cancelled.';
+}
+const QUICK = {
+  hi:{ student:['काम कितने घंटे का है?','मुझे कब आना है?','दुकान कहाँ है?','मैंने काम पूरा कर दिया है ✅'], business:['तय समय पर आ जाइए।','अपना आईडी कार्ड साथ लाइए।','धन्यवाद, काम पूरा हो गया।'] },
+  en:{ student:['How many hours is the work?','When should I come?','Where is the shop?','I have finished the work ✅'], business:['Please come at the time we discussed.','Please bring your ID card.','Thank you, the work is done.'] } };
+function quickHtml() { const q = QUICK[S.lang === 'hi' ? 'hi' : 'en'][S.role] || []; return '<div class="chips" style="margin-top:8px">' + q.map((t, i) => '<button class="chip" data-a="quick" data-v="' + i + '">' + esc(t) + '</button>').join('') + '</div>'; }
+function stepsHtml(st) { if (st === 'cancelled') return ''; const i = { chat:0, confirmed:1, completed:2 }[st]; return '<div class="steps">' + ['Matched','Confirmed','Completed'].map((l, n) => '<span class="' + (n <= i ? 'on' : '') + '">' + l + '</span>').join('') + '</div>'; }
 function chatHtml() { return S.msgs.length ? S.msgs.map((m) => '<div class="msg' + (m.sender_id === S.uid ? ' me' : '') + '">' + esc(m.body) + '</div>').join('') : '<div class="x">Say hello 👋</div>'; }
 function matchesView() {
   if (!S.matches.length) return '<h1>Matches</h1><div class="empty"><div style="font-size:48px">💬</div><p>' + (S.role === 'student' ? 'No matches yet. Swipe right, then wait for a business to accept you.' : 'No matches yet. Accept a student from My shifts.') + '</p></div>';
@@ -292,23 +321,25 @@ function matchesView() {
     const o = S.open === m.id, other = S.role === 'student' ? m.business_name : m.student_name, st = m.status;
     let body = '';
     if (o) {
-      body = '<div class="chat" id="chat">' + chatHtml() + '</div>';
-      if (st === 'chat' || st === 'confirmed') body += '<div class="row"><input data-f="msg" id="msg" placeholder="Type a message" aria-label="Message" value="' + esc(S.form.msg) + '"><button class="btn sm" data-a="send">Send</button></div>';
+      body = '<div class="note"><b>The shop has fixed ' + money(m.pay) + ' for this shift. It will not pay more than this.</b><br>Discuss the work timing and details here. The payment is settled between you two.</div><div class="chat" id="chat">' + chatHtml() + '</div>';
+      if (st === 'chat' || st === 'confirmed') body += '<div class="row"><input data-f="msg" id="msg" placeholder="Type a message" aria-label="Message" value="' + esc(S.form.msg) + '"><button class="btn sm" data-a="send">Send</button></div>' + quickHtml();
       if (st === 'chat') body += '<button class="btn ghost" style="margin-top:8px" data-a="confirm">Confirm shift</button><button class="btn ghost" style="margin-top:8px" data-a="cancel">Back out (no penalty)</button>';
       if (st === 'confirmed' && S.role === 'business') body += '<label for="late">Minutes the student was late</label><input id="late" data-f="late" type="number" min="0" value="' + esc(S.form.late) + '"><div class="two" style="margin-top:8px"><button class="btn" data-a="complete">Mark completed</button><button class="btn ghost" data-a="cancel">Cancel shift</button></div>';
       if (st === 'confirmed' && S.role === 'student') body += '<button class="btn ghost" style="margin-top:8px" data-a="cancel">Cancel shift</button><p class="x">Cancelling a confirmed shift lowers your trust score.</p>';
-      if (st === 'completed') body += '<div class="x" style="margin-top:8px">Rate ' + (S.role === 'student' ? 'this business' : 'this student') + '</div><div class="stars">' + [1,2,3,4,5].map((n) => '<button data-a="rate" data-v="' + n + '">' + n + '★</button>').join('') + '</div>';
+      if (st === 'completed') body += '<div class="note ok">Work completed ✅ Agreed pay: ' + money(m.pay) + '</div><div class="x" style="margin-top:8px">Rate ' + (S.role === 'student' ? 'this business' : 'this student') + '</div><div class="stars">' + [1,2,3,4,5].map((n) => '<button data-a="rate" data-v="' + n + '">' + n + '★</button>').join('') + '</div>';
     }
-    return '<div class="panel"><div class="row" data-a="open" data-id="' + m.id + '" style="cursor:pointer"><div class="av">' + ((CAT[m.category] || CAT.cafe).e) + '</div><div class="grow"><b>' + esc(m.title) + '</b><div class="x">' + esc(other) + ' · ' + money(m.pay) + '</div></div><span class="pill' + (st === 'completed' ? '' : st === 'cancelled' ? ' r' : ' w') + '">' + lab[st] + '</span></div>' + body + '</div>';
+    return '<div class="panel"><div class="row" data-a="open" data-id="' + m.id + '" style="cursor:pointer"><div class="av">' + ((CAT[m.category] || CAT.cafe).e) + '</div><div class="grow"><b>' + esc(m.title) + '</b><div class="x">' + esc(other) + ' · ' + money(m.pay) + '</div></div><span class="pill' + (st === 'completed' ? '' : st === 'cancelled' ? ' r' : ' w') + '">' + lab[st] + '</span></div><p class="x" style="margin:8px 0 0">' + hint(st) + '</p>' + stepsHtml(st) + (o || st === 'cancelled' ? '' : '<button class="btn ghost" style="margin-top:8px" data-a="open" data-id="' + m.id + '">💬 Open chat</button>') + body + '</div>';
   }).join('');
 }
 function profileView() {
   const m = S.me; if (!m) return '';
   const prog = m.skillProgress || [];
+  const dn = S.matches.filter((x) => x.status === 'completed'), earned = dn.reduce((a, x) => a + Number(x.pay), 0), up = S.matches.filter((x) => x.status === 'confirmed').length;
   return '<div class="panel" style="text-align:center"><div class="av" style="margin:0 auto 8px;width:70px;height:70px;font-size:36px">🧑‍🎓</div><h2 style="font-size:24px">' + esc(m.name) + '</h2><div class="x">' + esc(m.college || '') + ' · Student</div></div>'
+  + '<div class="panel"><div class="grid3"><div><b>' + dn.length + '</b><small>Completed shifts</small></div><div><b>' + money(earned) + '</b><small>Earned (listed pay)</small></div><div><b>' + up + '</b><small>Upcoming</small></div></div></div>'
   + (Number(m.rating) < MIN_STU ? '<div class="panel" style="background:var(--warnbg)"><b>⚠ Visibility reduced</b><div class="x">Your score is under ' + MIN_STU + ', so businesses using the reputation filter won’t see you.</div></div>' : '')
   + '<div class="panel"><h3>Work reputation score</h3><div class="grid3" style="margin-top:10px"><div><b class="score">' + Number(m.rating).toFixed(1) + '</b><small>⭐ Trust</small></div><div><b>' + esc(m.ontime_pct) + '%</b><small>On time</small></div><div><b>' + esc(m.cancels) + '</b><small>Cancels</small></div></div><p class="x">Late arrivals and cancelled shifts lower this score.</p></div>'
-  + '<div class="panel"><h3>Skill unlock system</h3><p class="x">Finish 10 shifts in a skill to earn its badge. Badge holders are preferred by businesses and get +15% pay.</p>'
+  + '<div class="panel"><h3>Skill unlock system</h3><p class="x">Finish 10 shifts in a skill to earn its badge. Badge holders are preferred by businesses.</p>'
   + (prog.filter((x) => x.completed > 0).map((x) => x.category).concat(prog.length ? [] : ['kirana','salon','sweets'])).map((k) => { const p = prog.find((x) => x.category === k), n = Math.min(p ? p.completed : 0, 10), on = p && p.unlocked;
       return '<div class="badge' + (on ? ' on' : '') + '"><span class="ic">' + CAT[k].e + '</span><div class="grow"><b>' + CAT[k].badge + '</b> ' + (on ? '<span class="pill">Unlocked</span>' : '') + '<div class="bar"><i style="width:' + n * 10 + '%"></i></div><span class="x">' + n + ' / 10 shifts</span></div></div>'; }).join('') + '</div>'
   + '<div class="panel"><div class="sw" style="margin:0"><div><b>Available now</b><div class="x">Get alerts for urgent shifts nearby</div></div><input type="checkbox" data-a="toggleavail" ' + (m.available_now ? 'checked' : '') + ' aria-label="Available now"></div></div>';
@@ -319,8 +350,8 @@ function postView() {
   return '<div class="kick">BUSINESS</div><h1>Hire in minutes.</h1><p class="sub">' + esc(b.name || '') + ' · ⭐ ' + Number(b.rating || 4.5).toFixed(1) + ' trust</p>'
   + '<div class="panel"><div class="row"><div class="grow"><b>' + (paid ? 'Membership active' : 'Free listings left') + '</b><div class="x">' + (paid ? 'Unlimited shifts until ' + new Date(b.plan_expires).toLocaleDateString('en-IN') : 'Post your first 2 jobs for free.') + '</div></div>' + (paid ? '' : '<span class="score" style="font-size:30px;color:var(--brand)">' + esc(b.free_listings_left) + '</span>') + '</div></div>'
   + '<div class="panel"><h3>Post a shift</h3><label for="ptitle">Role</label><input id="ptitle" data-f="ptitle" placeholder="e.g. Helper for festival rush at my shop" value="' + esc(S.form.ptitle) + '">'
-  + '<div class="two"><div><label for="ppay">Pay for the shift (₹)</label><input id="ppay" data-f="ppay" type="number" placeholder="e.g. 300" value="' + esc(S.form.ppay) + '"></div><div><label for="phours">Hours</label><input id="phours" data-f="phours" value="' + esc(S.form.phours) + '"></div></div>'
-  + '<label for="pcat">Category</label><select id="pcat" data-f="pcat">' + Object.keys(CAT).map((k) => '<option value="' + k + '"' + (S.form.pcat === k ? ' selected' : '') + '>' + CAT[k].name + '</option>').join('') + '</select>'
+  + '<div class="two"><div><label for="ppay">Fixed pay for this shift (₹)</label><input id="ppay" data-f="ppay" type="number" placeholder="e.g. 300" value="' + esc(S.form.ppay) + '"></div><div><label for="phours">Hours</label><input id="phours" data-f="phours" value="' + esc(S.form.phours) + '"></div></div>'
+  + '<p class="x">Students see this as the fixed pay. You won’t have to pay more than this.</p><label for="pcat">Category</label><select id="pcat" data-f="pcat">' + Object.keys(CAT).map((k) => '<option value="' + k + '"' + (S.form.pcat === k ? ' selected' : '') + '>' + CAT[k].name + '</option>').join('') + '</select>'
   + '<label>Skills needed</label>' + chips(SKILLS, S.form.pskills, 'pskill')
   + '<label for="pdesc">Description</label><textarea id="pdesc" data-f="pdesc" rows="2">' + esc(S.form.pdesc) + '</textarea>'
   + '<div class="sw"><div><b>⚡ Urgent hiring mode</b><div class="x">Instantly notify nearby students</div></div><input type="checkbox" data-f="purgent" ' + (S.form.purgent ? 'checked' : '') + ' aria-label="Urgent hiring"></div>'
@@ -346,9 +377,9 @@ function render() {
   else {
     const tabs = S.role === 'student' ? [['swipe','🔥','Swipe'],['matches','💬','Matches'],['me','👤','Profile']] : [['post','➕','Post'],['jobs','👥','My shifts'],['matches','💬','Matches']];
     body = ({ swipe:swipeView, matches:matchesView, me:profileView, post:postView, jobs:jobsView })[S.tab]();
-    nav = '<nav>' + tabs.map((t) => '<button data-a="tab" data-v="' + t[0] + '" class="' + (S.tab === t[0] ? 'on' : '') + '"><b>' + t[1] + '</b>' + t[2] + '</button>').join('') + '</nav>';
+    nav = '<nav>' + tabs.map((t) => '<button data-a="tab" data-v="' + t[0] + '" class="' + (S.tab === t[0] ? 'on' : '') + '"><b>' + t[1] + (t[0] === 'matches' && S.unread ? '<sup style="color:var(--brand)">●</sup>' : '') + '</b>' + t[2] + '</button>').join('') + '</nav>';
   }
-  $('app').innerHTML = L('<header><div class="logo"><i>S</i>ShiftPe</div>' + '<span><button class="chip" data-a="lang">' + (S.lang === 'hi' ? 'English' : 'हिंदी') + '</button> ' + (S.token ? '<button class="chip" data-a="logout">Log out</button>' : '') + '</span></header><main>' + body + '</main>' + nav
+  $('app').innerHTML = L('<header><div class="logo">' + LOGO(30) + 'ShiftPe</div>' + '<span><button class="chip" data-a="lang">' + (S.lang === 'hi' ? 'English' : 'हिंदी') + '</button> ' + (S.token ? '<button class="chip" data-a="logout">Log out</button>' : '') + '</span></header><main>' + body + '</main>' + nav
     + (S.toast ? '<div class="toast" role="status">' + esc(S.toast) + '</div>' : '')
     + (S.modal === 'match' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">✨</div><h2>It’s a Shift Match!</h2><p>Your shift is confirmed. Open the chat to coordinate.</p><button class="btn" data-a="gomatches">Open chat</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Keep swiping</button></div></div>' : '')
     + (S.modal === 'paywall' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">🔒</div><h2>2 free listings used</h2><p>Membership and listing charges apply after your free listings.</p><button class="btn" data-a="devplan">Test mode: activate 30-day membership</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Not now</button></div></div>' : ''));
@@ -428,8 +459,12 @@ document.addEventListener('click', (e) => {
     else if (a === 'refresh') await loadFeed();
     else if (a === 'claim') { const j = S.feed[S.fi]; await api('/jobs/' + j.id + '/claim', { method:'POST' }); S.fi++; S.modal = 'match'; }
     else if (a === 'closemodal') S.modal = null;
-    else if (a === 'gomatches') { S.modal = null; await enter('matches'); }
+    else if (a === 'gomatches') { S.modal = null; await enter('matches'); if (S.matches.length) await openMatch(S.matches[0].id); }
     else if (a === 'open') await openMatch(Number(id));
+    else if (a === 'quick') {
+      const body = (QUICK[S.lang === 'hi' ? 'hi' : 'en'][S.role] || [])[Number(v)]; if (!body) return;
+      await api('/matches/' + S.open + '/messages', { method:'POST', body:{ body } }); S.msgs = await api('/matches/' + S.open + '/messages');
+    }
     else if (a === 'send') {
       const body = S.form.msg.trim(); if (!body) return;
       await api('/matches/' + S.open + '/messages', { method:'POST', body:{ body } });
@@ -463,11 +498,23 @@ document.addEventListener('click', (e) => {
     else if (a === 'devplan') { await api('/billing/dev-activate', { method:'POST' }); S.modal = null; S.biz = await api('/businesses/me'); say('Membership active for 30 days (test mode)'); }
     else if (a === 'openjob') { const n = Number(id); if (S.openJob === n) S.openJob = null; else { S.openJob = n; await loadApplicants(n); } }
     else if (a === 'mintrust') { S.minTrust = el.checked; if (S.openJob) await loadApplicants(S.openJob); }
-    else if (a === 'accept') { await api('/jobs/' + id + '/accept/' + el.dataset.sid, { method:'POST' }); await loadApplicants(Number(id)); say('Matched! Open the Matches tab to chat.'); }
+    else if (a === 'accept') { const d = await api('/jobs/' + id + '/accept/' + el.dataset.sid, { method:'POST' }); await loadApplicants(Number(id)); await enter('matches'); await openMatch(d.matchId); say('Matched! You can chat now.'); }
   });
 });
 
 /* ---------- start ---------- */
+setInterval(async () => {
+  if (!S.token || S.screen !== 'app') return;
+  try {
+    const m = await api('/matches', { quiet:true }), g = sigOf(m);
+    if (msig === null) { msig = g; return; }
+    if (g !== msig) {
+      msig = g; S.matches = m;
+      if (S.tab !== 'matches') { S.unread = true; say('🔔 You have a new match update. Open the Matches tab.'); }
+      else if (!document.activeElement || document.activeElement.tagName !== 'INPUT') render();
+    }
+  } catch {}
+}, 20000);
 (function init() {
   const s = store.get('shiftpe');
   render();
