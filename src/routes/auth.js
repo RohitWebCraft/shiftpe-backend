@@ -6,7 +6,8 @@ const hash = (c) => crypto.createHash('sha256').update(c + process.env.JWT_SECRE
 const PHONE = /^\+?\d{10,13}$/;
 
 router.post('/request-otp', wrap(async (req, res) => {
-  const { phone, role } = req.body;
+  const { phone, role, pilotCode } = req.body;
+  if (process.env.PILOT_CODE && pilotCode !== process.env.PILOT_CODE) return res.status(403).json({ error: 'Invalid pilot code' });
   if (!PHONE.test(phone || '') || !['student', 'business'].includes(role)) return res.status(400).json({ error: 'Valid phone and role required' });
   const { rows: [r] } = await q(`SELECT COUNT(*)::int AS n FROM otps WHERE phone=$1 AND created_at > now() - interval '10 minutes'`, [phone]);
   if (r.n >= 3) return res.status(429).json({ error: 'Too many OTP requests. Try again in 10 minutes.' });
