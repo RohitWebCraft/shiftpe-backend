@@ -5,7 +5,7 @@ const { matchScore, BADGE_BONUS } = require('../lib/matching');
 const { notifyNearbyStudents, push } = require('../lib/notify');
 const MIN_STU = () => Number(process.env.MIN_STUDENT_TRUST) || 4.2;
 const MIN_BIZ = () => Number(process.env.MIN_BUSINESS_TRUST) || 3.5;
-const CATS = ['cafe', 'sales', 'edit', 'event'];
+const CATS = ['kirana','sweets','salon','cafe','sales','mobile','medical','event','edit','tuition','delivery','office','tourism'];
 
 // Business posts a shift. First 2 listings are free, then an active membership is required.
 router.post('/', requireAuth, requireRole('business'), wrap(async (req, res) => {
