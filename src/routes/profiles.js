@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { q } = require('../db');
+const { pool, q } = require('../db');
 const { requireAuth, requireRole, wrap } = require('../lib/auth');
 const { BADGE_NAMES } = require('../lib/matching');
 
@@ -48,4 +48,28 @@ router.post('/billing/dev-activate', requireAuth, requireRole('business'), wrap(
   await q(`UPDATE businesses SET plan_expires = now() + interval '30 days' WHERE user_id=$1`, [req.user.id]);
   res.json({ ok: true });
 }));
+
+// Delete account: removes personal data, closes open shifts, cancels live matches (no penalty to the other person).
+// Old chats and ratings stay for the other user but show "Deleted user".
+router.delete('/account', requireAuth, wrap(async (req, res) => {
+  const id = req.user.id;
+  const db = await pool.connect();
+  try {
+    await db.query('BEGIN');
+    await db.query("UPDATE jobs SET status='closed' WHERE business_id=$1 AND status='open'", [id]);
+    await db.query("UPDATE matches SET status='cancelled', finished_at=now() WHERE (student_id=$1 OR business_id=$1) AND status IN ('chat','confirmed')", [id]);
+    await db.query('DELETE FROM device_tokens WHERE user_id=$1', [id]);
+    await db.query('DELETE FROM swipes WHERE student_id=$1', [id]);
+    await db.query('DELETE FROM notifications WHERE user_id=$1', [id]);
+    await db.query('DELETE FROM skill_progress WHERE student_id=$1', [id]);
+    await db.query("UPDATE student_profiles SET age=NULL, college=NULL, skills='{}', available_now=false, location=NULL WHERE user_id=$1", [id]);
+    await db.query('UPDATE businesses SET location=NULL WHERE user_id=$1', [id]);
+    await db.query("UPDATE messages SET body='[deleted]' WHERE sender_id=$1", [id]);
+    await db.query('DELETE FROM otps WHERE phone=(SELECT phone FROM users WHERE id=$1)', [id]);
+    await db.query("UPDATE users SET name='Deleted user', phone='deleted-' || id::text WHERE id=$1", [id]);
+    await db.query('COMMIT');
+  } catch (e) { await db.query('ROLLBACK'); throw e; } finally { db.release(); }
+  res.json({ ok: true });
+}));
+
 module.exports = router;
