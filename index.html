@@ -164,7 +164,9 @@ const HI = Object.assign(Object.create(null), {
 '✅ Shift completed. Please rate the student.':'✅ काम पूरा हुआ। कृपया स्टूडेंट को रेटिंग दें।','This shift was cancelled.':'यह काम रद्द हो गया था।','💬 Open chat':'💬 चैट खोलें',
 'Completed shifts':'पूरे हुए काम','Earned (listed pay)':'कमाई (दी गई पे के हिसाब से)','Upcoming':'आने वाले काम',
 'Matched! You can chat now.':'मैच हो गया! अब आप चैट कर सकते हैं।','🔔 You have a new match update. Open the Matches tab.':'🔔 आपके मैच में नई अपडेट है। "मैच" टैब खोलें।',
-'Fixed pay for this shift (₹)':'इस काम के तय पैसे (₹)','Students see this as the fixed pay. You won’t have to pay more than this.':'स्टूडेंट इसे तय पैसे के रूप में देखेंगे। आपको इससे ज़्यादा नहीं देना होगा।','Discuss the work timing and details here. The payment is settled between you two.':'काम का समय और बातें यहीं तय करें। पैसों का लेन-देन आप दोनों आपस में करेंगे।','Pilot code':'पायलट कोड','Ask the person who invited you for this code.':'यह कोड आपको जिसने बुलाया है, उनसे पूछें।','Invalid pilot code':'पायलट कोड गलत है','Server error':'सर्वर में गड़बड़ी'
+'Fixed pay for this shift (₹)':'इस काम के तय पैसे (₹)','Students see this as the fixed pay. You won’t have to pay more than this.':'स्टूडेंट इसे तय पैसे के रूप में देखेंगे। आपको इससे ज़्यादा नहीं देना होगा।','Discuss the work timing and details here. The payment is settled between you two.':'काम का समय और बातें यहीं तय करें। पैसों का लेन-देन आप दोनों आपस में करेंगे।','Pilot code':'पायलट कोड','Delete my account':'मेरा अकाउंट हटाएँ','Delete your account?':'क्या आप अपना अकाउंट हटाना चाहते हैं?',
+'Your profile, skills and location will be removed and your open shifts will close. Your old chats will show “Deleted user”. This cannot be undone.':'आपकी प्रोफ़ाइल, हुनर और जगह हटा दी जाएगी और आपके खुले काम बंद हो जाएँगे। पुरानी चैट में आपका नाम “Deleted user” दिखेगा। यह वापस नहीं हो सकता।',
+'Yes, delete my account':'हाँ, मेरा अकाउंट हटाएँ','No, keep my account':'नहीं, अकाउंट रहने दें','Your account has been deleted.':'आपका अकाउंट हटा दिया गया है।','Ask the person who invited you for this code.':'यह कोड आपको जिसने बुलाया है, उनसे पूछें।','Invalid pilot code':'पायलट कोड गलत है','Server error':'सर्वर में गड़बड़ी'
 });
 const HIP = [
 [/^(\d+) gigs in your radius\. Businesses under 3\.5★ are hidden\.$/,'$1 काम आपके आस-पास हैं। 3.5★ से कम भरोसे वाली दुकानें नहीं दिखतीं।'],
@@ -312,6 +314,7 @@ const QUICK = {
   hi:{ student:['काम कितने घंटे का है?','मुझे कब आना है?','दुकान कहाँ है?','मैंने काम पूरा कर दिया है ✅'], business:['तय समय पर आ जाइए।','अपना आईडी कार्ड साथ लाइए।','धन्यवाद, काम पूरा हो गया।'] },
   en:{ student:['How many hours is the work?','When should I come?','Where is the shop?','I have finished the work ✅'], business:['Please come at the time we discussed.','Please bring your ID card.','Thank you, the work is done.'] } };
 function quickHtml() { const q = QUICK[S.lang === 'hi' ? 'hi' : 'en'][S.role] || []; return '<div class="chips" style="margin-top:8px">' + q.map((t, i) => '<button class="chip" data-a="quick" data-v="' + i + '">' + esc(t) + '</button>').join('') + '</div>'; }
+function delBtn() { return '<div style="text-align:center;margin:18px 0 8px"><button class="x" style="text-decoration:underline" data-a="askdelete">Delete my account</button></div>'; }
 function stepsHtml(st) { if (st === 'cancelled') return ''; const i = { chat:0, confirmed:1, completed:2 }[st]; return '<div class="steps">' + ['Matched','Confirmed','Completed'].map((l, n) => '<span class="' + (n <= i ? 'on' : '') + '">' + l + '</span>').join('') + '</div>'; }
 function chatHtml() { return S.msgs.length ? S.msgs.map((m) => '<div class="msg' + (String(m.sender_id) === String(S.uid) ? ' me' : '') + '">' + esc(m.body) + '</div>').join('') : '<div class="x">Say hello 👋</div>'; }
 function matchesView() {
@@ -322,7 +325,7 @@ function matchesView() {
     let body = '';
     if (o) {
       body = '<div class="note"><b>The shop has fixed ' + money(m.pay) + ' for this shift. It will not pay more than this.</b><br>Discuss the work timing and details here. The payment is settled between you two.</div><div class="chat" id="chat">' + chatHtml() + '</div>';
-      if (st === 'chat' || st === 'confirmed') body += '<div class="row"><input data-f="msg" id="msg" placeholder="Type a message" aria-label="Message" value="' + esc(S.form.msg) + '"><button class="btn sm" data-a="send">Send</button></div>' + quickHtml();
+      if (st !== 'cancelled') body += '<div class="row"><input data-f="msg" id="msg" placeholder="Type a message" aria-label="Message" value="' + esc(S.form.msg) + '"><button class="btn sm" data-a="send">Send</button></div>' + quickHtml();
       if (st === 'chat') body += '<button class="btn ghost" style="margin-top:8px" data-a="confirm">Confirm shift</button><button class="btn ghost" style="margin-top:8px" data-a="cancel">Back out (no penalty)</button>';
       if (st === 'confirmed' && S.role === 'business') body += '<label for="late">Minutes the student was late</label><input id="late" data-f="late" type="number" min="0" value="' + esc(S.form.late) + '"><div class="two" style="margin-top:8px"><button class="btn" data-a="complete">Mark completed</button><button class="btn ghost" data-a="cancel">Cancel shift</button></div>';
       if (st === 'confirmed' && S.role === 'student') body += '<button class="btn ghost" style="margin-top:8px" data-a="cancel">Cancel shift</button><p class="x">Cancelling a confirmed shift lowers your trust score.</p>';
@@ -342,7 +345,7 @@ function profileView() {
   + '<div class="panel"><h3>Skill unlock system</h3><p class="x">Finish 10 shifts in a skill to earn its badge. Badge holders are preferred by businesses.</p>'
   + (prog.filter((x) => x.completed > 0).map((x) => x.category).concat(prog.length ? [] : ['kirana','salon','sweets'])).map((k) => { const p = prog.find((x) => x.category === k), n = Math.min(p ? p.completed : 0, 10), on = p && p.unlocked;
       return '<div class="badge' + (on ? ' on' : '') + '"><span class="ic">' + CAT[k].e + '</span><div class="grow"><b>' + CAT[k].badge + '</b> ' + (on ? '<span class="pill">Unlocked</span>' : '') + '<div class="bar"><i style="width:' + n * 10 + '%"></i></div><span class="x">' + n + ' / 10 shifts</span></div></div>'; }).join('') + '</div>'
-  + '<div class="panel"><div class="sw" style="margin:0"><div><b>Available now</b><div class="x">Get alerts for urgent shifts nearby</div></div><input type="checkbox" data-a="toggleavail" ' + (m.available_now ? 'checked' : '') + ' aria-label="Available now"></div></div>';
+  + '<div class="panel"><div class="sw" style="margin:0"><div><b>Available now</b><div class="x">Get alerts for urgent shifts nearby</div></div><input type="checkbox" data-a="toggleavail" ' + (m.available_now ? 'checked' : '') + ' aria-label="Available now"></div></div>' + delBtn();
 }
 function postView() {
   const b = S.biz || {};
@@ -355,7 +358,7 @@ function postView() {
   + '<label>Skills needed</label>' + chips(SKILLS, S.form.pskills, 'pskill')
   + '<label for="pdesc">Description</label><textarea id="pdesc" data-f="pdesc" rows="2">' + esc(S.form.pdesc) + '</textarea>'
   + '<div class="sw"><div><b>⚡ Urgent hiring mode</b><div class="x">Instantly notify nearby students</div></div><input type="checkbox" data-f="purgent" ' + (S.form.purgent ? 'checked' : '') + ' aria-label="Urgent hiring"></div>'
-  + '<button class="btn" style="margin-top:12px" data-a="post">' + (paid || Number(b.free_listings_left) > 0 ? 'Post shift' : 'Start hiring') + '</button></div>';
+  + '<button class="btn" style="margin-top:12px" data-a="post">' + (paid || Number(b.free_listings_left) > 0 ? 'Post shift' : 'Start hiring') + '</button></div>' + delBtn();
 }
 function jobsView() {
   let h = '<h1>My shifts</h1><p class="sub">See who is interested and accept students.</p><div class="panel"><div class="sw" style="margin:0"><div><b>Hide students under ' + MIN_STU + '★</b><div class="x">Late and cancelling students are filtered out</div></div><input type="checkbox" data-a="mintrust" ' + (S.minTrust ? 'checked' : '') + ' aria-label="Reputation filter"></div></div>';
@@ -382,7 +385,8 @@ function render() {
   $('app').innerHTML = L('<header><div class="logo">' + LOGO(30) + 'ShiftPe</div>' + '<span><button class="chip" data-a="lang">' + (S.lang === 'hi' ? 'English' : 'हिंदी') + '</button> ' + (S.token ? '<button class="chip" data-a="logout">Log out</button>' : '') + '</span></header><main>' + body + '</main>' + nav
     + (S.toast ? '<div class="toast" role="status">' + esc(S.toast) + '</div>' : '')
     + (S.modal === 'match' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">✨</div><h2>It’s a Shift Match!</h2><p>Your shift is confirmed. Open the chat to coordinate.</p><button class="btn" data-a="gomatches">Open chat</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Keep swiping</button></div></div>' : '')
-    + (S.modal === 'paywall' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">🔒</div><h2>2 free listings used</h2><p>Membership and listing charges apply after your free listings.</p><button class="btn" data-a="devplan">Test mode: activate 30-day membership</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Not now</button></div></div>' : ''));
+    + (S.modal === 'paywall' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">🔒</div><h2>2 free listings used</h2><p>Membership and listing charges apply after your free listings.</p><button class="btn" data-a="devplan">Test mode: activate 30-day membership</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">Not now</button></div></div>' : '')
+    + (S.modal === 'delete' ? '<div class="modal"><div class="sheet"><div style="font-size:48px">⚠️</div><h2>Delete your account?</h2><p>Your profile, skills and location will be removed and your open shifts will close. Your old chats will show “Deleted user”. This cannot be undone.</p><button class="btn" style="background:#c62828" data-a="confirmdelete">Yes, delete my account</button><button class="btn ghost" style="margin-top:8px" data-a="closemodal">No, keep my account</button></div></div>' : ''));
   const m = document.querySelector('main'); if (m) m.scrollTop = sc;
   bindDrag();
 }
@@ -434,6 +438,8 @@ document.addEventListener('click', (e) => {
       await bootstrap();
     }
     else if (a === 'lang') { S.lang = S.lang === 'hi' ? 'en' : 'hi'; store.set('shiftpe_lang', S.lang); }
+    else if (a === 'askdelete') S.modal = 'delete';
+    else if (a === 'confirmdelete') { await api('/account', { method:'DELETE' }); logout(); say('Your account has been deleted.'); }
     else if (a === 'logout') logout();
     else if (a === 'skill') S.form.skills = toggle(S.form.skills, v);
     else if (a === 'pskill') S.form.pskills = toggle(S.form.pskills, v);
