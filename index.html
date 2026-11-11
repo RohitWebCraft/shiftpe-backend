@@ -164,7 +164,7 @@ const HI = Object.assign(Object.create(null), {
 '✅ Shift completed. Please rate the student.':'✅ काम पूरा हुआ। कृपया स्टूडेंट को रेटिंग दें।','This shift was cancelled.':'यह काम रद्द हो गया था।','💬 Open chat':'💬 चैट खोलें',
 'Completed shifts':'पूरे हुए काम','Earned (listed pay)':'कमाई (दी गई पे के हिसाब से)','Upcoming':'आने वाले काम',
 'Matched! You can chat now.':'मैच हो गया! अब आप चैट कर सकते हैं।','🔔 You have a new match update. Open the Matches tab.':'🔔 आपके मैच में नई अपडेट है। "मैच" टैब खोलें।',
-'Fixed pay for this shift (₹)':'इस काम के तय पैसे (₹)','Students see this as the fixed pay. You won’t have to pay more than this.':'स्टूडेंट इसे तय पैसे के रूप में देखेंगे। आपको इससे ज़्यादा नहीं देना होगा।','Discuss the work timing and details here. The payment is settled between you two.':'काम का समय और बातें यहीं तय करें। पैसों का लेन-देन आप दोनों आपस में करेंगे।','Pilot code':'पायलट कोड','Delete my account':'मेरा अकाउंट हटाएँ','Delete your account?':'क्या आप अपना अकाउंट हटाना चाहते हैं?',
+'Fixed pay for this shift (₹)':'इस काम के तय पैसे (₹)','Students see this as the fixed pay. You won’t have to pay more than this.':'स्टूडेंट इसे तय पैसे के रूप में देखेंगे। आपको इससे ज़्यादा नहीं देना होगा।','Discuss the work timing and details here. The payment is settled between you two.':'काम का समय और बातें यहीं तय करें। पैसों का लेन-देन आप दोनों आपस में करेंगे।','Pilot code':'पायलट कोड','✏️ Edit profile':'✏️ प्रोफ़ाइल बदलें','Edit your profile':'अपनी प्रोफ़ाइल बदलें','Edit your shop':'अपनी दुकान की जानकारी बदलें','Keep my current location':'मेरी अभी की जगह रहने दें','Cancel':'रद्द करें','Profile saved ✅':'प्रोफ़ाइल सेव हो गई ✅','Business':'दुकान / बिज़नेस','Delete my account':'मेरा अकाउंट हटाएँ','Delete your account?':'क्या आप अपना अकाउंट हटाना चाहते हैं?',
 'Your profile, skills and location will be removed and your open shifts will close. Your old chats will show “Deleted user”. This cannot be undone.':'आपकी प्रोफ़ाइल, हुनर और जगह हटा दी जाएगी और आपके खुले काम बंद हो जाएँगे। पुरानी चैट में आपका नाम “Deleted user” दिखेगा। यह वापस नहीं हो सकता।',
 'Yes, delete my account':'हाँ, मेरा अकाउंट हटाएँ','No, keep my account':'नहीं, अकाउंट रहने दें','Your account has been deleted.':'आपका अकाउंट हटा दिया गया है।','Ask the person who invited you for this code.':'यह कोड आपको जिसने बुलाया है, उनसे पूछें।','Invalid pilot code':'पायलट कोड गलत है','Server error':'सर्वर में गड़बड़ी'
 });
@@ -189,7 +189,7 @@ function L(h) {
   return h.replace(/>([^<>]+)</g, (m, t) => '>' + tr(t) + '<').replace(/(placeholder|aria-label)="([^"]+)"/g, (m, a, v) => a + '="' + tr(v) + '"');
 }
 
-const S = { lang:(store.get('shiftpe_lang')||'hi'), radius:10, token:null, role:null, uid:null, screen:'login', tab:'swipe', toast:null, modal:null, roleSel:'student', otpSent:false,
+const S = { lang:(store.get('shiftpe_lang')||'hi'), editing:false, radius:10, token:null, role:null, uid:null, screen:'login', tab:'swipe', toast:null, modal:null, roleSel:'student', otpSent:false,
   me:null, biz:null, feed:[], fi:0, matches:[], open:null, msgs:[], jobs:[], apps:{}, openJob:null, minTrust:true, poll:null,
   form:{ phone:'9000000001', otp:'', name:'', age:'', college:'', skills:[], avail:true, pilot:(store.get('shiftpe_pilot')||''), town:'satna', lat:TOWNS[0].lat, lng:TOWNS[0].lng,
          ptitle:'', ppay:'', phours:'6 PM - 10 PM', pcat:'kirana', pdesc:'', pskills:[], purgent:false, msg:'', late:'0' } };
@@ -212,7 +212,7 @@ async function run(fn) {
   catch (e) { if (e.status === 401 && S.token) { logout(); say('Please log in again'); return; } say(e.message || 'Something went wrong'); }
   render();
 }
-function logout() { store.del('shiftpe'); clearInterval(S.poll); Object.assign(S, { token:null, role:null, uid:null, screen:'login', otpSent:false, me:null, biz:null, feed:[], fi:0, matches:[], open:null, jobs:[], apps:{}, modal:null }); }
+function logout() { store.del('shiftpe'); clearInterval(S.poll); Object.assign(S, { token:null, role:null, uid:null, screen:'login', otpSent:false, me:null, biz:null, feed:[], fi:0, matches:[], open:null, jobs:[], apps:{}, modal:null, editing:false }); }
 
 /* ---------- data loaders ---------- */
 async function bootstrap() {
@@ -248,7 +248,7 @@ async function enter(t) {
   if (t === 'swipe') await loadFeed();
   if (t === 'matches') await loadMatches();
   if (t === 'me') { S.me = await api('/students/me'); await loadMatches(); }
-  if (t === 'post') S.biz = await api('/businesses/me');
+  if (t === 'post' || t === 'bizme') S.biz = await api('/businesses/me');
   if (t === 'jobs') await loadJobs();
 }
 async function openMatch(id) {
@@ -264,7 +264,7 @@ async function openMatch(id) {
 /* ---------- views ---------- */
 function chips(list, sel, act) { return '<div class="chips">' + list.map((s) => '<button class="chip' + (sel.includes(s) ? ' on' : '') + '" data-a="' + act + '" data-v="' + esc(s) + '">' + esc(s) + '</button>').join('') + '</div>'; }
 function locBox() {
-  return '<label for="town">Your town</label><select id="town" data-f="town">' + TOWNS.map((t) => '<option value="' + t.k + '"' + (S.form.town === t.k ? ' selected' : '') + '>' + t.name + '</option>').join('') + '<option value="gps"' + (S.form.town === 'gps' ? ' selected' : '') + '>My location (GPS)</option></select>'
+  return '<label for="town">Your town</label><select id="town" data-f="town">' + (S.editing ? '<option value="keep"' + (S.form.town === 'keep' ? ' selected' : '') + '>Keep my current location</option>' : '') + TOWNS.map((t) => '<option value="' + t.k + '"' + (S.form.town === t.k ? ' selected' : '') + '>' + t.name + '</option>').join('') + '<option value="gps"' + (S.form.town === 'gps' ? ' selected' : '') + '>My location (GPS)</option></select>'
     + '<button class="btn ghost sm" style="margin-top:8px" data-a="geo">📍 Use my location</button><p class="x">Testing? Pick the same town for the student and business accounts.</p>';
 }
 function loginView() {
@@ -278,13 +278,13 @@ function loginView() {
   + '<p class="x">Testing alone? Use 9000000001 as a student and 9000000002 as a business. A phone number keeps the role it first signed up with.</p></div></div>';
 }
 function setupView() {
-  if (S.role === 'student') return '<h1>Set up your profile</h1><p class="sub">Businesses see this when you show interest.</p><div class="panel">'
+  if (S.role === 'student') return '<h1>' + (S.editing ? 'Edit your profile' : 'Set up your profile') + '</h1><p class="sub">Businesses see this when you show interest.</p><div class="panel">'
     + '<label for="name">Full name</label><input id="name" data-f="name" value="' + esc(S.form.name) + '">'
     + '<div class="two"><div><label for="age">Age (18+)</label><input id="age" data-f="age" type="number" value="' + esc(S.form.age) + '"></div><div><label for="college">College</label><input id="college" data-f="college" placeholder="College name (e.g. Govt. College, Panna)" value="' + esc(S.form.college) + '"></div></div>'
     + '<label>Your skills</label>' + chips(SKILLS, S.form.skills, 'skill')
     + '<div class="sw"><div><b>Available now</b><div class="x">Get urgent shift alerts nearby</div></div><input type="checkbox" data-f="avail" ' + (S.form.avail ? 'checked' : '') + ' aria-label="Available now"></div>'
-    + locBox() + '<button class="btn" style="margin-top:14px" data-a="savestudent">Save and start swiping</button></div>';
-  return '<h1>Set up your shop</h1><p class="sub">Students nearby will see your shifts.</p><div class="panel"><label for="name">Business name</label><input id="name" data-f="name" value="' + esc(S.form.name) + '">' + locBox() + '<button class="btn" style="margin-top:14px" data-a="savebiz">Save</button></div>';
+    + locBox() + '<button class="btn" style="margin-top:14px" data-a="savestudent">' + (S.editing ? 'Save' : 'Save and start swiping') + '</button>' + (S.editing ? '<button class="btn ghost" style="margin-top:8px" data-a="canceledit">Cancel</button>' : '') + '</div>';
+  return '<h1>' + (S.editing ? 'Edit your shop' : 'Set up your shop') + '</h1><p class="sub">Students nearby will see your shifts.</p><div class="panel"><label for="name">Business name</label><input id="name" data-f="name" value="' + esc(S.form.name) + '">' + locBox() + '<button class="btn" style="margin-top:14px" data-a="savebiz">Save</button>' + (S.editing ? '<button class="btn ghost" style="margin-top:8px" data-a="canceledit">Cancel</button>' : '') + '</div>';
 }
 function card(j, top) {
   const c = CAT[j.category] || CAT.cafe;
@@ -314,7 +314,13 @@ const QUICK = {
   hi:{ student:['काम कितने घंटे का है?','मुझे कब आना है?','दुकान कहाँ है?','मैंने काम पूरा कर दिया है ✅'], business:['तय समय पर आ जाइए।','अपना आईडी कार्ड साथ लाइए।','धन्यवाद, काम पूरा हो गया।'] },
   en:{ student:['How many hours is the work?','When should I come?','Where is the shop?','I have finished the work ✅'], business:['Please come at the time we discussed.','Please bring your ID card.','Thank you, the work is done.'] } };
 function quickHtml() { const q = QUICK[S.lang === 'hi' ? 'hi' : 'en'][S.role] || []; return '<div class="chips" style="margin-top:8px">' + q.map((t, i) => '<button class="chip" data-a="quick" data-v="' + i + '">' + esc(t) + '</button>').join('') + '</div>'; }
-function delBtn() { return '<div style="text-align:center;margin:18px 0 8px"><button class="x" style="text-decoration:underline" data-a="askdelete">Delete my account</button></div>'; }
+function endEdit() { S.editing = false; S.form.town = 'satna'; S.form.lat = TOWNS[0].lat; S.form.lng = TOWNS[0].lng; }
+function delBtn() { return '<button class="btn ghost" style="color:#c62828;border-color:#c62828;margin-top:18px" data-a="askdelete">Delete my account</button><p class="x" style="text-align:center;margin-top:10px">ShiftPe v1.4</p>'; }
+function bizProfileView() {
+  const b = S.biz || {}, paid = b.plan_expires && new Date(b.plan_expires) > new Date();
+  return '<div class="panel" style="text-align:center"><div style="text-align:right"><button class="btn ghost sm" data-a="editprofile">✏️ Edit profile</button></div><div class="av" style="margin:0 auto 8px;width:70px;height:70px;font-size:36px">🏪</div><h2 style="font-size:24px">' + esc(b.name) + '</h2><div class="x">Business</div></div>'
+    + '<div class="panel"><h3>Work reputation score</h3><div class="grid3" style="margin-top:10px;grid-template-columns:1fr 1fr"><div><b class="score">' + Number(b.rating || 4.5).toFixed(1) + '</b><small>⭐ Trust</small></div><div><b>' + (paid ? '∞' : esc(b.free_listings_left)) + '</b><small>Free listings left</small></div></div><p class="x">Late arrivals and cancelled shifts lower this score.</p></div>' + delBtn();
+}
 function stepsHtml(st) { if (st === 'cancelled') return ''; const i = { chat:0, confirmed:1, completed:2 }[st]; return '<div class="steps">' + ['Matched','Confirmed','Completed'].map((l, n) => '<span class="' + (n <= i ? 'on' : '') + '">' + l + '</span>').join('') + '</div>'; }
 function chatHtml() { return S.msgs.length ? S.msgs.map((m) => '<div class="msg' + (String(m.sender_id) === String(S.uid) ? ' me' : '') + '">' + esc(m.body) + '</div>').join('') : '<div class="x">Say hello 👋</div>'; }
 function matchesView() {
@@ -338,7 +344,7 @@ function profileView() {
   const m = S.me; if (!m) return '';
   const prog = m.skillProgress || [];
   const dn = S.matches.filter((x) => x.status === 'completed'), earned = dn.reduce((a, x) => a + Number(x.pay), 0), up = S.matches.filter((x) => x.status === 'confirmed').length;
-  return '<div class="panel" style="text-align:center"><div class="av" style="margin:0 auto 8px;width:70px;height:70px;font-size:36px">🧑‍🎓</div><h2 style="font-size:24px">' + esc(m.name) + '</h2><div class="x">' + esc(m.college || '') + ' · Student</div></div>'
+  return '<div class="panel" style="text-align:center"><div style="text-align:right"><button class="btn ghost sm" data-a="editprofile">✏️ Edit profile</button></div><div class="av" style="margin:0 auto 8px;width:70px;height:70px;font-size:36px">🧑‍🎓</div><h2 style="font-size:24px">' + esc(m.name) + '</h2><div class="x">' + esc(m.college || '') + ' · Student</div></div>'
   + '<div class="panel"><div class="grid3"><div><b>' + dn.length + '</b><small>Completed shifts</small></div><div><b>' + money(earned) + '</b><small>Earned (listed pay)</small></div><div><b>' + up + '</b><small>Upcoming</small></div></div></div>'
   + (Number(m.rating) < MIN_STU ? '<div class="panel" style="background:var(--warnbg)"><b>⚠ Visibility reduced</b><div class="x">Your score is under ' + MIN_STU + ', so businesses using the reputation filter won’t see you.</div></div>' : '')
   + '<div class="panel"><h3>Work reputation score</h3><div class="grid3" style="margin-top:10px"><div><b class="score">' + Number(m.rating).toFixed(1) + '</b><small>⭐ Trust</small></div><div><b>' + esc(m.ontime_pct) + '%</b><small>On time</small></div><div><b>' + esc(m.cancels) + '</b><small>Cancels</small></div></div><p class="x">Late arrivals and cancelled shifts lower this score.</p></div>'
@@ -358,7 +364,7 @@ function postView() {
   + '<label>Skills needed</label>' + chips(SKILLS, S.form.pskills, 'pskill')
   + '<label for="pdesc">Description</label><textarea id="pdesc" data-f="pdesc" rows="2">' + esc(S.form.pdesc) + '</textarea>'
   + '<div class="sw"><div><b>⚡ Urgent hiring mode</b><div class="x">Instantly notify nearby students</div></div><input type="checkbox" data-f="purgent" ' + (S.form.purgent ? 'checked' : '') + ' aria-label="Urgent hiring"></div>'
-  + '<button class="btn" style="margin-top:12px" data-a="post">' + (paid || Number(b.free_listings_left) > 0 ? 'Post shift' : 'Start hiring') + '</button></div>' + delBtn();
+  + '<button class="btn" style="margin-top:12px" data-a="post">' + (paid || Number(b.free_listings_left) > 0 ? 'Post shift' : 'Start hiring') + '</button></div>';
 }
 function jobsView() {
   let h = '<h1>My shifts</h1><p class="sub">See who is interested and accept students.</p><div class="panel"><div class="sw" style="margin:0"><div><b>Hide students under ' + MIN_STU + '★</b><div class="x">Late and cancelling students are filtered out</div></div><input type="checkbox" data-a="mintrust" ' + (S.minTrust ? 'checked' : '') + ' aria-label="Reputation filter"></div></div>';
@@ -378,8 +384,8 @@ function render() {
   if (S.screen === 'login') body = loginView();
   else if (S.screen === 'setup') body = setupView();
   else {
-    const tabs = S.role === 'student' ? [['swipe','🔥','Swipe'],['matches','💬','Matches'],['me','👤','Profile']] : [['post','➕','Post'],['jobs','👥','My shifts'],['matches','💬','Matches']];
-    body = ({ swipe:swipeView, matches:matchesView, me:profileView, post:postView, jobs:jobsView })[S.tab]();
+    const tabs = S.role === 'student' ? [['swipe','🔥','Swipe'],['matches','💬','Matches'],['me','👤','Profile']] : [['post','➕','Post'],['jobs','👥','My shifts'],['matches','💬','Matches'],['bizme','👤','Profile']];
+    body = ({ swipe:swipeView, matches:matchesView, me:profileView, bizme:bizProfileView, post:postView, jobs:jobsView })[S.tab]();
     nav = '<nav>' + tabs.map((t) => '<button data-a="tab" data-v="' + t[0] + '" class="' + (S.tab === t[0] ? 'on' : '') + '"><b>' + t[1] + (t[0] === 'matches' && S.unread ? '<sup style="color:var(--brand)">●</sup>' : '') + '</b>' + t[2] + '</button>').join('') + '</nav>';
   }
   $('app').innerHTML = L('<header><div class="logo">' + LOGO(30) + 'ShiftPe</div>' + '<span><button class="chip" data-a="lang">' + (S.lang === 'hi' ? 'English' : 'हिंदी') + '</button> ' + (S.token ? '<button class="chip" data-a="logout">Log out</button>' : '') + '</span></header><main>' + body + '</main>' + nav
@@ -438,6 +444,12 @@ document.addEventListener('click', (e) => {
       await bootstrap();
     }
     else if (a === 'lang') { S.lang = S.lang === 'hi' ? 'en' : 'hi'; store.set('shiftpe_lang', S.lang); }
+    else if (a === 'editprofile') {
+      if (S.role === 'student') { const m = S.me || {}; Object.assign(S.form, { name:m.name || '', age:m.age || '', college:m.college || '', skills:m.skills || [], avail:!!m.available_now }); }
+      else S.form.name = (S.biz && S.biz.name) || '';
+      S.form.town = 'keep'; S.editing = true; S.screen = 'setup';
+    }
+    else if (a === 'canceledit') { endEdit(); S.screen = 'app'; }
     else if (a === 'askdelete') S.modal = 'delete';
     else if (a === 'confirmdelete') { await api('/account', { method:'DELETE' }); logout(); say('Your account has been deleted.'); }
     else if (a === 'logout') logout();
@@ -451,13 +463,16 @@ document.addEventListener('click', (e) => {
       const f = S.form, age = Number(f.age);
       if (!f.name.trim() || !f.college.trim()) throw new Error('Enter your name and college');
       if (!(age >= 18)) throw new Error('You must be 18 or above');
-      await api('/students/me', { method:'PUT', body:{ name:f.name.trim(), age, college:f.college.trim(), skills:f.skills, lat:f.lat, lng:f.lng, availableNow:!!f.avail } });
-      S.me = await api('/students/me'); S.screen = 'app'; S.tab = 'swipe'; await loadFeed();
+      await api('/students/me', { method:'PUT', body:{ name:f.name.trim(), age, college:f.college.trim(), skills:f.skills, lat:(S.editing && f.town === 'keep') ? undefined : f.lat, lng:(S.editing && f.town === 'keep') ? undefined : f.lng, availableNow:!!f.avail } });
+      S.me = await api('/students/me'); S.screen = 'app';
+      if (S.editing) { endEdit(); S.tab = 'me'; say('Profile saved ✅'); } else { S.tab = 'swipe'; await loadFeed(); }
     }
     else if (a === 'savebiz') {
       if (!S.form.name.trim()) throw new Error('Enter your business name');
-      await api('/businesses/me', { method:'PUT', body:{ name:S.form.name.trim(), lat:S.form.lat, lng:S.form.lng } });
-      S.biz = await api('/businesses/me'); S.screen = 'app'; S.tab = 'post';
+      const keep = S.editing && S.form.town === 'keep';
+      await api('/businesses/me', { method:'PUT', body:{ name:S.form.name.trim(), lat:keep ? undefined : S.form.lat, lng:keep ? undefined : S.form.lng } });
+      S.biz = await api('/businesses/me'); S.screen = 'app';
+      if (S.editing) { endEdit(); S.tab = 'bizme'; say('Profile saved ✅'); } else S.tab = 'post';
     }
     else if (a === 'tab') await enter(v);
     else if (a === 'like' || a === 'pass') return fly(a);
