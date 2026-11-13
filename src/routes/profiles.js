@@ -1,4 +1,5 @@
 const router = require('express').Router();
+router.use(require('./extra')); // invites + find-workers routes
 const { pool, q } = require('../db');
 const { requireAuth, requireRole, wrap } = require('../lib/auth');
 const { BADGE_NAMES } = require('../lib/matching');
@@ -60,6 +61,7 @@ router.delete('/account', requireAuth, wrap(async (req, res) => {
     await db.query("UPDATE matches SET status='cancelled', finished_at=now() WHERE (student_id=$1 OR business_id=$1) AND status IN ('chat','confirmed')", [id]);
     await db.query('DELETE FROM device_tokens WHERE user_id=$1', [id]);
     await db.query('DELETE FROM swipes WHERE student_id=$1', [id]);
+    await db.query('DELETE FROM invites WHERE student_id=$1 OR business_id=$1', [id]);
     await db.query('DELETE FROM notifications WHERE user_id=$1', [id]);
     await db.query('DELETE FROM skill_progress WHERE student_id=$1', [id]);
     await db.query("UPDATE student_profiles SET age=NULL, college=NULL, skills='{}', available_now=false, location=NULL WHERE user_id=$1", [id]);
